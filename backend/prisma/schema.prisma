@@ -40,6 +40,7 @@ model School {
 
   academicYears AcademicYear[]
   classGroups   ClassGroup[]
+  subjects      Subject[]
   users         User[]
 }
 
@@ -77,6 +78,8 @@ model ClassGroup {
 
 model Subject {
   id       String @id @default(cuid())
+  schoolId String
+  school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   name     String
   code     String
 
@@ -84,7 +87,7 @@ model Subject {
   attendances        Attendance[]
   assessments        Assessment[]
 
-  @@unique([code])
+  @@unique([schoolId, code])
 }
 
 model User {
