@@ -1,11 +1,12 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import type { AttendanceStatus, Prisma } from '@prisma/client';
+import { StudentAccessService, type Requester } from '../common/access/student-access.service.js';
 import { PrismaService } from '../prisma/prisma.service.js';
-
-type DbClient = PrismaService | Prisma.TransactionClient;
 import type { BulkMarkAttendanceDto } from './dto/bulk-mark-attendance.dto.js';
 import type { MarkAttendanceDto } from './dto/mark-attendance.dto.js';
 import type { UpdateAttendanceDto } from './dto/update-attendance.dto.js';
+
+type DbClient = PrismaService | Prisma.TransactionClient;
 
 interface AttendanceQuery {
   classGroupId?: string;
@@ -18,7 +19,10 @@ interface AttendanceQuery {
 
 @Injectable()
 export class AttendanceService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly studentAccess: StudentAccessService,
+  ) {}
 
   async mark(schoolId: string, recordedById: string, dto: MarkAttendanceDto) {
     await this.assertClassGroupInSchool(schoolId, dto.classGroupId);
@@ -95,8 +99,8 @@ export class AttendanceService {
     });
   }
 
-  async findForStudent(schoolId: string, requester: { id: string; role: string }, studentId: string) {
-    await this.assertCanViewStudent(schoolId, requester, studentId);
+  async findForStudent(schoolId: string, requester: Requester, studentId: string) {
+    await this.studentAccess.assertCanView(schoolId, requester, studentId);
     return this.prisma.attendance.findMany({
       where: { studentId, classGroup: { schoolId } },
       include: { classGroup: true, subject: true },
@@ -104,8 +108,8 @@ export class AttendanceService {
     });
   }
 
-  async summaryForStudent(schoolId: string, requester: { id: string; role: string }, studentId: string) {
-    await this.assertCanViewStudent(schoolId, requester, studentId);
+  async summaryForStudent(schoolId: string, requester: Requester, studentId: string) {
+    await this.studentAccess.assertCanView(schoolId, requester, studentId);
     const grouped = await this.prisma.attendance.groupBy({
       by: ['status'],
       where: { studentId, classGroup: { schoolId } },
@@ -154,42 +158,4 @@ export class AttendanceService {
     }
   }
 
-  private async assertCanViewStudent(
-    schoolId: string,
-    requester: { id: string; role: string },
-    studentId: string,
-  ) {
-    const student = await this.prisma.studentProfile.findFirst({
-      where: { id: studentId, user: { schoolId } },
-    });
-    if (!student) {
-      throw new NotFoundException('Élève introuvable.');
-    }
-
-    if (requester.role === 'ADMIN' || requester.role === 'TEACHER') {
-      return;
-    }
-
-    if (requester.role === 'STUDENT') {
-      if (student.userId !== requester.id) {
-        throw new ForbiddenException("Vous ne pouvez consulter que vos propres présences.");
-      }
-      return;
-    }
-
-    if (requester.role === 'PARENT') {
-      const parentProfile = await this.prisma.parentProfile.findUnique({ where: { userId: requester.id } });
-      const link = parentProfile
-        ? await this.prisma.parentStudent.findUnique({
-            where: { parentId_studentId: { parentId: parentProfile.id, studentId } },
-          })
-        : null;
-      if (!link) {
-        throw new ForbiddenException('Vous ne pouvez consulter que les présences de vos enfants.');
-      }
-      return;
-    }
-
-    throw new ForbiddenException('Accès refusé.');
-  }
 }
