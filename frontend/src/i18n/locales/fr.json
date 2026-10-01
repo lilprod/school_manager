@@ -1,0 +1,88 @@
+{
+  "app": {
+    "name": "Gestion d'École"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "create": "Créer",
+    "edit": "Modifier",
+    "delete": "Supprimer",
+    "actions": "Actions",
+    "search": "Rechercher",
+    "back": "Retour",
+    "logout": "Déconnexion",
+    "error": "Une erreur est survenue",
+    "noData": "Aucune donnée"
+  },
+  "auth": {
+    "login": "Connexion",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "loginButton": "Se connecter",
+    "loginError": "Identifiants invalides. Veuillez réessayer.",
+    "welcome": "Bienvenue sur la plateforme de gestion scolaire"
+  },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "students": "Élèves",
+    "teachers": "Enseignants",
+    "classes": "Classes",
+    "subjects": "Matières",
+    "attendance": "Présences",
+    "grades": "Notes",
+    "academicYears": "Années académiques",
+    "school": "École"
+  },
+  "roles": {
+    "ADMIN": "Administrateur",
+    "TEACHER": "Enseignant",
+    "STUDENT": "Élève",
+    "PARENT": "Parent"
+  },
+  "dashboard": {
+    "welcomeBack": "Bon retour, {{name}} !",
+    "totalStudents": "Élèves",
+    "totalTeachers": "Enseignants",
+    "totalClasses": "Classes",
+    "mySchool": "Mon école",
+    "myChildren": "Mes enfants",
+    "myAttendance": "Ma présence",
+    "myGrades": "Mes notes",
+    "overallAverage": "Moyenne générale"
+  },
+  "students": {
+    "title": "Élèves",
+    "firstName": "Prénom",
+    "lastName": "Nom",
+    "studentNumber": "Numéro d'élève",
+    "class": "Classe",
+    "email": "E-mail",
+    "addStudent": "Ajouter un élève",
+    "noStudents": "Aucun élève trouvé"
+  },
+  "attendance": {
+    "title": "Présences",
+    "date": "Date",
+    "status": "Statut",
+    "PRESENT": "Présent",
+    "ABSENT": "Absent",
+    "LATE": "Retard",
+    "EXCUSED": "Excusé",
+    "markAttendance": "Saisir les présences",
+    "selectClass": "Sélectionner une classe"
+  },
+  "grades": {
+    "title": "Notes",
+    "assessment": "Évaluation",
+    "subject": "Matière",
+    "score": "Note",
+    "average": "Moyenne",
+    "reportCard": "Bulletin"
+  },
+  "language": {
+    "fr": "Français",
+    "en": "English"
+  }
+}

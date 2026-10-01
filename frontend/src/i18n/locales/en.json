@@ -1,0 +1,88 @@
+{
+  "app": {
+    "name": "School Manager"
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "create": "Create",
+    "edit": "Edit",
+    "delete": "Delete",
+    "actions": "Actions",
+    "search": "Search",
+    "back": "Back",
+    "logout": "Log out",
+    "error": "Something went wrong",
+    "noData": "No data"
+  },
+  "auth": {
+    "login": "Sign in",
+    "email": "Email address",
+    "password": "Password",
+    "loginButton": "Sign in",
+    "loginError": "Invalid credentials. Please try again.",
+    "welcome": "Welcome to the school management platform"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "students": "Students",
+    "teachers": "Teachers",
+    "classes": "Classes",
+    "subjects": "Subjects",
+    "attendance": "Attendance",
+    "grades": "Grades",
+    "academicYears": "Academic years",
+    "school": "School"
+  },
+  "roles": {
+    "ADMIN": "Administrator",
+    "TEACHER": "Teacher",
+    "STUDENT": "Student",
+    "PARENT": "Parent"
+  },
+  "dashboard": {
+    "welcomeBack": "Welcome back, {{name}}!",
+    "totalStudents": "Students",
+    "totalTeachers": "Teachers",
+    "totalClasses": "Classes",
+    "mySchool": "My school",
+    "myChildren": "My children",
+    "myAttendance": "My attendance",
+    "myGrades": "My grades",
+    "overallAverage": "Overall average"
+  },
+  "students": {
+    "title": "Students",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "studentNumber": "Student number",
+    "class": "Class",
+    "email": "Email",
+    "addStudent": "Add student",
+    "noStudents": "No students found"
+  },
+  "attendance": {
+    "title": "Attendance",
+    "date": "Date",
+    "status": "Status",
+    "PRESENT": "Present",
+    "ABSENT": "Absent",
+    "LATE": "Late",
+    "EXCUSED": "Excused",
+    "markAttendance": "Mark attendance",
+    "selectClass": "Select a class"
+  },
+  "grades": {
+    "title": "Grades",
+    "assessment": "Assessment",
+    "subject": "Subject",
+    "score": "Score",
+    "average": "Average",
+    "reportCard": "Report card"
+  },
+  "language": {
+    "fr": "Français",
+    "en": "English"
+  }
+}
