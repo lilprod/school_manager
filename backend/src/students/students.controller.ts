@@ -28,6 +28,18 @@ export class StudentsController {
     return this.studentsService.findAll(user.schoolId, classGroupId);
   }
 
+  @Roles(Role.STUDENT)
+  @Get('me/profile')
+  findMyProfile(@CurrentUser() user: AuthenticatedUser) {
+    return this.studentsService.findMyProfile(user.schoolId, user.id);
+  }
+
+  @Roles(Role.PARENT)
+  @Get('my-children')
+  findMyChildren(@CurrentUser() user: AuthenticatedUser) {
+    return this.studentsService.findMyChildren(user.schoolId, user.id);
+  }
+
   @Roles(Role.ADMIN, Role.TEACHER)
   @Get(':id')
   findOne(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {

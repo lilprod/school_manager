@@ -99,6 +99,32 @@ export class StudentsService {
     return this.sanitize(student);
   }
 
+  async findMyProfile(schoolId: string, userId: string) {
+    const student = await this.prisma.studentProfile.findFirst({
+      where: { userId, user: { schoolId } },
+      include: studentInclude,
+    });
+    if (!student) {
+      throw new NotFoundException('Profil élève introuvable.');
+    }
+    return this.sanitize(student);
+  }
+
+  async findMyChildren(schoolId: string, parentUserId: string) {
+    const parentProfile = await this.prisma.parentProfile.findFirst({
+      where: { userId: parentUserId, user: { schoolId } },
+    });
+    if (!parentProfile) {
+      return [];
+    }
+    const students = await this.prisma.studentProfile.findMany({
+      where: { guardians: { some: { parentId: parentProfile.id } }, user: { schoolId } },
+      include: studentInclude,
+      orderBy: { user: { lastName: 'asc' } },
+    });
+    return students.map((s) => this.sanitize(s));
+  }
+
   async update(schoolId: string, id: string, dto: UpdateStudentDto) {
     const student = await this.prisma.studentProfile.findFirst({ where: { id, user: { schoolId } } });
     if (!student) {
