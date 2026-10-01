@@ -62,9 +62,9 @@ model AcademicYear {
 }
 
 model ClassGroup {
-  id       String  @id @default(cuid())
+  id       String @id @default(cuid())
   schoolId String
-  school   School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   name     String
   level    String
 
@@ -127,12 +127,12 @@ model RefreshToken {
 }
 
 model StudentProfile {
-  id             String   @id @default(cuid())
-  userId         String   @unique
-  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  studentNumber  String   @unique
-  dateOfBirth    DateTime?
-  gender         String?
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  studentNumber String    @unique
+  dateOfBirth   DateTime?
+  gender        String?
 
   enrollments Enrollment[]
   attendances Attendance[]
@@ -141,10 +141,10 @@ model StudentProfile {
 }
 
 model TeacherProfile {
-  id           String @id @default(cuid())
-  userId       String @unique
-  user         User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  employeeNumber String @unique
+  id             String  @id @default(cuid())
+  userId         String  @unique
+  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  employeeNumber String  @unique
   qualifications String?
 
   assignments TeacherAssignment[]
@@ -159,40 +159,40 @@ model ParentProfile {
 }
 
 model ParentStudent {
-  id        String          @id @default(cuid())
+  id        String         @id @default(cuid())
   parentId  String
-  parent    ParentProfile   @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  parent    ParentProfile  @relation(fields: [parentId], references: [id], onDelete: Cascade)
   studentId String
-  student   StudentProfile  @relation(fields: [studentId], references: [id], onDelete: Cascade)
-  relation  String          @default("parent")
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  relation  String         @default("parent")
 
   @@unique([parentId, studentId])
 }
 
 model Enrollment {
-  id             String        @id @default(cuid())
+  id             String         @id @default(cuid())
   studentId      String
   student        StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
   classGroupId   String
-  classGroup     ClassGroup    @relation(fields: [classGroupId], references: [id], onDelete: Cascade)
+  classGroup     ClassGroup     @relation(fields: [classGroupId], references: [id], onDelete: Cascade)
   academicYearId String
-  academicYear   AcademicYear  @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
-  status         String        @default("active")
-  createdAt      DateTime      @default(now())
+  academicYear   AcademicYear   @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  status         String         @default("active")
+  createdAt      DateTime       @default(now())
 
   @@unique([studentId, academicYearId])
 }
 
 model TeacherAssignment {
-  id             String        @id @default(cuid())
+  id             String         @id @default(cuid())
   teacherId      String
   teacher        TeacherProfile @relation(fields: [teacherId], references: [id], onDelete: Cascade)
   classGroupId   String
-  classGroup     ClassGroup    @relation(fields: [classGroupId], references: [id], onDelete: Cascade)
+  classGroup     ClassGroup     @relation(fields: [classGroupId], references: [id], onDelete: Cascade)
   subjectId      String
-  subject        Subject       @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  subject        Subject        @relation(fields: [subjectId], references: [id], onDelete: Cascade)
   academicYearId String
-  academicYear   AcademicYear  @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  academicYear   AcademicYear   @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
 
   @@unique([teacherId, classGroupId, subjectId, academicYearId])
 }
@@ -211,7 +211,7 @@ model Attendance {
   recordedById String
   createdAt    DateTime         @default(now())
 
-  @@unique([studentId, classGroupId, subjectId, date])
+  @@index([studentId, classGroupId, subjectId, date])
 }
 
 model Assessment {

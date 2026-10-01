@@ -12,6 +12,7 @@ import { ClassGroupsModule } from './class-groups/class-groups.module.js';
 import { SubjectsModule } from './subjects/subjects.module.js';
 import { StudentsModule } from './students/students.module.js';
 import { TeachersModule } from './teachers/teachers.module.js';
+import { AttendanceModule } from './attendance/attendance.module.js';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { TeachersModule } from './teachers/teachers.module.js';
     SubjectsModule,
     StudentsModule,
     TeachersModule,
+    AttendanceModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },
