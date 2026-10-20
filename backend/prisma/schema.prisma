@@ -8,10 +8,40 @@ datasource db {
 }
 
 enum Role {
+  SUPER_ADMIN
   ADMIN
   TEACHER
   STUDENT
   PARENT
+}
+
+enum SchoolStatus {
+  PENDING_APPROVAL
+  ACTIVE
+  SUSPENDED
+}
+
+enum OnboardingSource {
+  MANUAL
+  SELF_SERVICE
+}
+
+enum SubscriptionStatus {
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  SUSPENDED
+  CANCELLED
+}
+
+enum BillingPeriod {
+  MONTHLY
+  YEARLY
+}
+
+enum PaymentMethod {
+  CASH
+  MOBILE_MONEY
 }
 
 enum AttendanceStatus {
@@ -29,19 +59,22 @@ enum AssessmentType {
 }
 
 model School {
-  id        String   @id @default(cuid())
-  name      String
-  address   String?
-  phone     String?
-  email     String?
-  logoUrl   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id               String           @id @default(cuid())
+  name             String
+  address          String?
+  phone            String?
+  email            String?
+  logoUrl          String?
+  status           SchoolStatus     @default(PENDING_APPROVAL)
+  onboardingSource OnboardingSource @default(MANUAL)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
 
   academicYears AcademicYear[]
   classGroups   ClassGroup[]
   subjects      Subject[]
   users         User[]
+  subscription  Subscription?
 }
 
 model AcademicYear {
@@ -92,8 +125,8 @@ model Subject {
 
 model User {
   id           String   @id @default(cuid())
-  schoolId     String
-  school       School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  schoolId     String?
+  school       School?  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
   email        String   @unique
   passwordHash String
   role         Role
@@ -110,8 +143,9 @@ model User {
   teacherProfile TeacherProfile?
   parentProfile  ParentProfile?
 
-  refreshTokens RefreshToken[]
-  auditLogs     AuditLog[]
+  refreshTokens    RefreshToken[]
+  auditLogs        AuditLog[]
+  recordedPayments Payment[]
 }
 
 model RefreshToken {
@@ -242,6 +276,56 @@ model Grade {
   createdAt    DateTime       @default(now())
 
   @@unique([assessmentId, studentId])
+}
+
+model Plan {
+  id            String        @id @default(cuid())
+  name          String
+  code          String        @unique
+  priceAmount   Float
+  currency      String        @default("XOF")
+  billingPeriod BillingPeriod @default(MONTHLY)
+  maxStudents   Int?
+  maxTeachers   Int?
+  maxClasses    Int?
+  isActive      Boolean       @default(true)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id               String             @id @default(cuid())
+  schoolId         String             @unique
+  school           School             @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  planId           String
+  plan             Plan               @relation(fields: [planId], references: [id])
+  status           SubscriptionStatus @default(TRIALING)
+  startDate        DateTime           @default(now())
+  currentPeriodEnd DateTime?
+  trialEndsAt      DateTime?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  payments Payment[]
+}
+
+model Payment {
+  id             String        @id @default(cuid())
+  subscriptionId String
+  subscription   Subscription  @relation(fields: [subscriptionId], references: [id], onDelete: Cascade)
+  amount         Float
+  currency       String        @default("XOF")
+  method         PaymentMethod
+  reference      String?
+  notes          String?
+  recordedById   String
+  recordedBy     User          @relation(fields: [recordedById], references: [id])
+  paidAt         DateTime      @default(now())
+  createdAt      DateTime      @default(now())
+
+  @@index([subscriptionId])
 }
 
 model AuditLog {
