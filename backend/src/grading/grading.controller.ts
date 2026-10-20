@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
+import { requireSchoolId } from '../common/utils/require-school-id.js';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.js';
 import { BulkEnterGradesDto } from './dto/bulk-enter-grades.dto.js';
 import { CreateAssessmentDto } from './dto/create-assessment.dto.js';
@@ -18,7 +19,7 @@ export class GradingController {
   @Roles(Role.ADMIN, Role.TEACHER)
   @Post('assessments')
   createAssessment(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreateAssessmentDto) {
-    return this.gradingService.createAssessment(user.schoolId, dto);
+    return this.gradingService.createAssessment(requireSchoolId(user), dto);
   }
 
   @Get('assessments')
@@ -28,12 +29,12 @@ export class GradingController {
     @Query('subjectId') subjectId?: string,
     @Query('academicYearId') academicYearId?: string,
   ) {
-    return this.gradingService.findAssessments(user.schoolId, { classGroupId, subjectId, academicYearId });
+    return this.gradingService.findAssessments(requireSchoolId(user), { classGroupId, subjectId, academicYearId });
   }
 
   @Get('assessments/:id')
   findAssessment(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
-    return this.gradingService.findAssessment(user.schoolId, id);
+    return this.gradingService.findAssessment(requireSchoolId(user), id);
   }
 
   @Roles(Role.ADMIN, Role.TEACHER)
@@ -43,13 +44,13 @@ export class GradingController {
     @Param('id') id: string,
     @Body() dto: UpdateAssessmentDto,
   ) {
-    return this.gradingService.updateAssessment(user.schoolId, id, dto);
+    return this.gradingService.updateAssessment(requireSchoolId(user), id, dto);
   }
 
   @Roles(Role.ADMIN, Role.TEACHER)
   @Delete('assessments/:id')
   removeAssessment(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
-    return this.gradingService.removeAssessment(user.schoolId, id);
+    return this.gradingService.removeAssessment(requireSchoolId(user), id);
   }
 
   @Roles(Role.ADMIN, Role.TEACHER)
@@ -59,13 +60,13 @@ export class GradingController {
     @Param('id') id: string,
     @Body() dto: BulkEnterGradesDto,
   ) {
-    return this.gradingService.enterGrades(user.schoolId, id, dto);
+    return this.gradingService.enterGrades(requireSchoolId(user), id, dto);
   }
 
   @Roles(Role.ADMIN, Role.TEACHER)
   @Get('assessments/:id/grades')
   gradesForAssessment(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
-    return this.gradingService.gradesForAssessment(user.schoolId, id);
+    return this.gradingService.gradesForAssessment(requireSchoolId(user), id);
   }
 
   @Get('grades/student/:studentId')

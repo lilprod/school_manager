@@ -99,20 +99,20 @@ export class AttendanceService {
     });
   }
 
-  async findForStudent(schoolId: string, requester: Requester, studentId: string) {
+  async findForStudent(schoolId: string | null, requester: Requester, studentId: string) {
     await this.studentAccess.assertCanView(schoolId, requester, studentId);
     return this.prisma.attendance.findMany({
-      where: { studentId, classGroup: { schoolId } },
+      where: { studentId },
       include: { classGroup: true, subject: true },
       orderBy: { date: 'desc' },
     });
   }
 
-  async summaryForStudent(schoolId: string, requester: Requester, studentId: string) {
+  async summaryForStudent(schoolId: string | null, requester: Requester, studentId: string) {
     await this.studentAccess.assertCanView(schoolId, requester, studentId);
     const grouped = await this.prisma.attendance.groupBy({
       by: ['status'],
-      where: { studentId, classGroup: { schoolId } },
+      where: { studentId },
       _count: { status: true },
     });
     return grouped.map((g) => ({ status: g.status, count: g._count.status }));

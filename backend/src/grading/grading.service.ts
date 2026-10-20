@@ -103,26 +103,23 @@ export class GradingService {
     });
   }
 
-  async gradesForStudent(schoolId: string, requester: Requester, studentId: string, academicYearId?: string) {
+  async gradesForStudent(schoolId: string | null, requester: Requester, studentId: string, academicYearId?: string) {
     await this.studentAccess.assertCanView(schoolId, requester, studentId);
     return this.prisma.grade.findMany({
       where: {
         studentId,
-        assessment: {
-          classGroup: { schoolId },
-          ...(academicYearId ? { academicYearId } : {}),
-        },
+        ...(academicYearId ? { assessment: { academicYearId } } : {}),
       },
       include: { assessment: { include: assessmentInclude } },
       orderBy: { createdAt: 'desc' },
     });
   }
 
-  async reportCard(schoolId: string, requester: Requester, studentId: string, academicYearId: string) {
+  async reportCard(schoolId: string | null, requester: Requester, studentId: string, academicYearId: string) {
     await this.studentAccess.assertCanView(schoolId, requester, studentId);
 
     const grades = await this.prisma.grade.findMany({
-      where: { studentId, assessment: { classGroup: { schoolId }, academicYearId } },
+      where: { studentId, assessment: { academicYearId } },
       include: { assessment: { include: { subject: true } } },
     });
 

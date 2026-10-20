@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
+import { requireSchoolId } from '../common/utils/require-school-id.js';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.js';
 import { AttendanceService } from './attendance.service.js';
 import { BulkMarkAttendanceDto } from './dto/bulk-mark-attendance.dto.js';
@@ -18,13 +19,13 @@ export class AttendanceController {
   @Roles(Role.ADMIN, Role.TEACHER)
   @Post()
   mark(@CurrentUser() user: AuthenticatedUser, @Body() dto: MarkAttendanceDto) {
-    return this.attendanceService.mark(user.schoolId, user.id, dto);
+    return this.attendanceService.mark(requireSchoolId(user), user.id, dto);
   }
 
   @Roles(Role.ADMIN, Role.TEACHER)
   @Post('bulk')
   bulkMark(@CurrentUser() user: AuthenticatedUser, @Body() dto: BulkMarkAttendanceDto) {
-    return this.attendanceService.bulkMark(user.schoolId, user.id, dto);
+    return this.attendanceService.bulkMark(requireSchoolId(user), user.id, dto);
   }
 
   @Roles(Role.ADMIN, Role.TEACHER)
@@ -38,7 +39,7 @@ export class AttendanceController {
     @Query('from') from?: string,
     @Query('to') to?: string,
   ) {
-    return this.attendanceService.findAll(user.schoolId, {
+    return this.attendanceService.findAll(requireSchoolId(user), {
       classGroupId,
       studentId,
       subjectId,
@@ -61,12 +62,12 @@ export class AttendanceController {
   @Roles(Role.ADMIN, Role.TEACHER)
   @Patch(':id')
   update(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string, @Body() dto: UpdateAttendanceDto) {
-    return this.attendanceService.update(user.schoolId, id, dto);
+    return this.attendanceService.update(requireSchoolId(user), id, dto);
   }
 
   @Roles(Role.ADMIN, Role.TEACHER)
   @Delete(':id')
   remove(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
-    return this.attendanceService.remove(user.schoolId, id);
+    return this.attendanceService.remove(requireSchoolId(user), id);
   }
 }

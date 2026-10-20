@@ -10,9 +10,14 @@ export interface Requester {
 export class StudentAccessService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async assertCanView(schoolId: string, requester: Requester, studentId: string): Promise<void> {
+  async assertCanView(schoolId: string | null, requester: Requester, studentId: string): Promise<void> {
+    // A parent can have children in different schools, so their own account's
+    // schoolId (even if legacy data happens to have one set) must never scope
+    // which student they can look up — the ParentStudent link below is the
+    // only real boundary for that role.
+    const scopeBySchool = schoolId && requester.role !== 'PARENT';
     const student = await this.prisma.studentProfile.findFirst({
-      where: { id: studentId, user: { schoolId } },
+      where: { id: studentId, ...(scopeBySchool ? { user: { schoolId } } : {}) },
     });
     if (!student) {
       throw new NotFoundException('Élève introuvable.');

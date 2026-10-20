@@ -110,15 +110,15 @@ export class StudentsService {
     return this.sanitize(student);
   }
 
-  async findMyChildren(schoolId: string, parentUserId: string) {
+  async findMyChildren(parentUserId: string) {
     const parentProfile = await this.prisma.parentProfile.findFirst({
-      where: { userId: parentUserId, user: { schoolId } },
+      where: { userId: parentUserId },
     });
     if (!parentProfile) {
       return [];
     }
     const students = await this.prisma.studentProfile.findMany({
-      where: { guardians: { some: { parentId: parentProfile.id } }, user: { schoolId } },
+      where: { guardians: { some: { parentId: parentProfile.id } } },
       include: studentInclude,
       orderBy: { user: { lastName: 'asc' } },
     });
