@@ -15,6 +15,7 @@ import { TeachersModule } from './teachers/teachers.module.js';
 import { AttendanceModule } from './attendance/attendance.module.js';
 import { GradingModule } from './grading/grading.module.js';
 import { PlansModule } from './plans/plans.module.js';
+import { PlatformSchoolsModule } from './platform-schools/platform-schools.module.js';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { PlansModule } from './plans/plans.module.js';
     AttendanceModule,
     GradingModule,
     PlansModule,
+    PlatformSchoolsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },
