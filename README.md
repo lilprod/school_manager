@@ -13,6 +13,7 @@ Voir [Roadmap](#roadmap--prochaines-phases) pour le périmètre complet prévu
 |---|---|
 | Backend | NestJS (TypeScript, ESM), Prisma ORM, PostgreSQL |
 | Authentification | JWT (access + refresh tokens rotatifs), RBAC |
+| Rate-limiting | `@nestjs/throttler` (inscription self-service) |
 | Frontend | React 19 + Vite, TypeScript, Tailwind CSS v4 |
 | État / données | Zustand (auth), TanStack Query (données serveur) |
 | Formulaires | React Hook Form + Zod |
@@ -81,6 +82,18 @@ docker compose exec backend pnpm db:seed
 > disponible). Le flux applicatif complet a en revanche été testé de bout
 > en bout en navigateur réel via le mode "sans Docker" ci-dessus.
 
+## Architecture multi-tenant
+
+Le système héberge plusieurs écoles sur une base de données et un schéma
+partagés ("shared database, shared schema") : la colonne `schoolId`,
+présente sur la quasi-totalité des tables, sert de discriminant et toutes
+les requêtes applicatives sont scopées par cette valeur. Le rôle
+`SUPER_ADMIN` opère au niveau plateforme et n'est rattaché à aucune école
+(`schoolId` nul) ; il gère les écoles, les plans et les abonnements. Un
+parent peut avoir des enfants inscrits dans plusieurs écoles différentes :
+son compte n'est donc, lui non plus, pas rattaché à une école unique, et
+l'accès à ses enfants n'est jamais filtré par `schoolId`.
+
 ## Comptes de démonstration
 
 Après `pnpm db:seed`, tous les comptes partagent le mot de passe
@@ -88,15 +101,24 @@ Après `pnpm db:seed`, tous les comptes partagent le mot de passe
 
 | Rôle | Email |
 |---|---|
+| Super-administrateur (plateforme) | super.admin@platform.app |
 | Administrateur | admin@ecole.fr |
 | Enseignant | prof.math@ecole.fr, prof.francais@ecole.fr |
 | Élève | eleve1@ecole.fr … eleve8@ecole.fr |
 | Parent | parent1@ecole.fr, parent2@ecole.fr |
 
+Le seed crée également trois écoles illustrant les statuts possibles :
+une école active avec abonnement payé (Lycée Victor Hugo), une école
+active en période d'essai sans paiement encore enregistré (Collège
+Molière), et une école en attente d'approbation (École Les Flamboyants).
+Le compte `parent1@ecole.fr` a des enfants dans deux écoles différentes,
+pour illustrer le support des parents multi-écoles.
+
 ## Fonctionnalités livrées (Phase 1 — MVP)
 
 - **Authentification** : JWT access + refresh tokens rotatifs, RBAC
-  (ADMIN / TEACHER / STUDENT / PARENT), changement de mot de passe
+  (SUPER_ADMIN / ADMIN / TEACHER / STUDENT / PARENT), changement de mot
+  de passe
 - **Administration** : profil école, années académiques, classes, matières
 - **Élèves** : inscription, profils, historique de classe, transfert,
   liaison avec les parents/tuteurs
@@ -108,16 +130,42 @@ Après `pnpm db:seed`, tous les comptes partagent le mot de passe
 - **Interface** : tableaux de bord par rôle, FR/EN, mode sombre, design
   responsive
 
+### Plateforme SaaS (Phase 1.5)
+
+- **Provisioning des écoles** : création manuelle par un super-admin
+  (école immédiatement active) et inscription self-service publique
+  (`/signup`, école en attente d'approbation)
+- **Plans / licences** : CRUD des plans (quotas, tarifs, périodicité),
+  exposition publique des plans actifs pour le formulaire d'inscription
+- **Abonnements** : suivi du statut (essai/actif/suspendu/annulé) par
+  école, approbation/suspension/réactivation par le super-admin
+- **Paiements manuels** : enregistrement d'un paiement (espèces ou mobile
+  money, pas d'intégration API en v1), historique par école, mise à jour
+  automatique de l'échéance d'abonnement
+- **Parents multi-écoles** : un même parent peut consulter les données de
+  ses enfants scolarisés dans des écoles différentes
+
 ## Roadmap — prochaines phases
 
 Le prompt d'origine couvrait un ERP scolaire complet (12 modules, apps
 web + mobile). Cette Phase 1 livre les fondations (auth, élèves,
-enseignants, présences, notes). Prochaines étapes suggérées :
+enseignants, présences, notes) et la Phase 1.5 la gouvernance SaaS
+multi-écoles. Prochaines étapes suggérées :
 
-- **Phase 2** : finances (frais, factures, paiements), communication
-  (messagerie, annonces), bibliothèque
+- **Phase 2** : finances (frais, factures, paiements des familles —
+  distinct de la facturation SaaS), communication (messagerie,
+  annonces), bibliothèque
 - **Phase 3** : transport, rapports/analytics avancés (export PDF/Excel),
   application mobile (React Native), intégration paiement en ligne (Stripe)
+
+Hors scope, noté pour plus tard (voir `docs/delegation/00-OVERVIEW.md`) :
+
+- Application effective des quotas de plan (`maxStudents`/`maxTeachers`/
+  `maxClasses`)
+- Expiration automatique des essais (`trialEndsAt`)
+- Routage par sous-domaine dédié à chaque école
+- Durcissement de l'isolation multi-tenant via une Prisma Client
+  Extension (au-delà du scoping applicatif actuel par `schoolId`)
 
 ## Sécurité
 
@@ -128,3 +176,5 @@ enseignants, présences, notes). Prochaines étapes suggérées :
 - Isolation des données par école (toutes les requêtes sont scopées par
   `schoolId`)
 - Journal d'audit basique (`AuditLog`) sur les connexions
+- Rate-limiting sur l'inscription self-service publique (`/platform/schools/signup`)
+  pour limiter les abus (`@nestjs/throttler`)
