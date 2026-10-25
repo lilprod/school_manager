@@ -1,8 +1,8 @@
-export type Role = 'ADMIN' | 'TEACHER' | 'STUDENT' | 'PARENT'
+export type Role = 'SUPER_ADMIN' | 'ADMIN' | 'TEACHER' | 'STUDENT' | 'PARENT'
 
 export interface User {
   id: string
-  schoolId: string
+  schoolId: string | null
   email: string
   role: Role
   firstName: string
@@ -13,6 +13,12 @@ export interface User {
   locale: string
 }
 
+export type SchoolStatus = 'PENDING_APPROVAL' | 'ACTIVE' | 'SUSPENDED'
+export type OnboardingSource = 'MANUAL' | 'SELF_SERVICE'
+export type SubscriptionStatus = 'TRIALING' | 'ACTIVE' | 'PAST_DUE' | 'SUSPENDED' | 'CANCELLED'
+export type BillingPeriod = 'MONTHLY' | 'YEARLY'
+export type PaymentMethod = 'CASH' | 'MOBILE_MONEY'
+
 export interface School {
   id: string
   name: string
@@ -20,6 +26,51 @@ export interface School {
   phone?: string | null
   email?: string | null
   logoUrl?: string | null
+  status?: SchoolStatus
+  onboardingSource?: OnboardingSource
+  requestedPlanId?: string | null
+  subscription?: Subscription | null
+  _count?: { users: number; classGroups: number }
+}
+
+export interface SchoolSummary extends School {
+  status: SchoolStatus
+  onboardingSource: OnboardingSource
+}
+
+export interface Plan {
+  id: string
+  name: string
+  code: string
+  priceAmount: number
+  currency: string
+  billingPeriod: BillingPeriod
+  maxStudents?: number | null
+  maxTeachers?: number | null
+  maxClasses?: number | null
+  isActive: boolean
+}
+
+export interface Payment {
+  id: string
+  amount: number
+  currency: string
+  method: PaymentMethod
+  reference?: string | null
+  notes?: string | null
+  paidAt: string
+}
+
+export interface Subscription {
+  id: string
+  schoolId: string
+  planId: string
+  plan: Plan
+  status: SubscriptionStatus
+  startDate: string
+  currentPeriodEnd?: string | null
+  trialEndsAt?: string | null
+  payments?: Payment[]
 }
 
 export interface AcademicYear {

@@ -5,6 +5,11 @@ import ClassesPage from './pages/ClassesPage'
 import DashboardPage from './pages/DashboardPage'
 import GradesPage from './pages/GradesPage'
 import LoginPage from './pages/LoginPage'
+import SignupPage from './pages/SignupPage'
+import PlatformDashboardPage from './pages/platform/PlatformDashboardPage'
+import PlatformPlansPage from './pages/platform/PlatformPlansPage'
+import PlatformSchoolDetailPage from './pages/platform/PlatformSchoolDetailPage'
+import PlatformSchoolsListPage from './pages/platform/PlatformSchoolsListPage'
 import StudentsPage from './pages/StudentsPage'
 import SubjectsPage from './pages/SubjectsPage'
 import TeachersPage from './pages/TeachersPage'
@@ -14,6 +19,7 @@ export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/signup" element={<SignupPage />} />
 
       <Route
         element={
@@ -68,6 +74,38 @@ export default function App() {
           element={
             <ProtectedRoute roles={['ADMIN', 'TEACHER']}>
               <GradesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/platform/dashboard"
+          element={
+            <ProtectedRoute roles={['SUPER_ADMIN']}>
+              <PlatformDashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/platform/schools"
+          element={
+            <ProtectedRoute roles={['SUPER_ADMIN']}>
+              <PlatformSchoolsListPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/platform/schools/:id"
+          element={
+            <ProtectedRoute roles={['SUPER_ADMIN']}>
+              <PlatformSchoolDetailPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/platform/plans"
+          element={
+            <ProtectedRoute roles={['SUPER_ADMIN']}>
+              <PlatformPlansPage />
             </ProtectedRoute>
           }
         />

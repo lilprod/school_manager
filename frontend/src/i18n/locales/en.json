@@ -33,13 +33,74 @@
     "attendance": "Attendance",
     "grades": "Grades",
     "academicYears": "Academic years",
-    "school": "School"
+    "school": "School",
+    "platformSchools": "Schools",
+    "platformPlans": "Plans"
   },
   "roles": {
+    "SUPER_ADMIN": "Super admin",
     "ADMIN": "Administrator",
     "TEACHER": "Teacher",
     "STUDENT": "Student",
     "PARENT": "Parent"
+  },
+  "platform": {
+    "dashboard": "Platform dashboard",
+    "totalSchools": "Schools",
+    "pendingSchools": "Pending",
+    "activeSchools": "Active",
+    "schools": "Schools",
+    "plans": "Plans",
+    "createSchool": "Create a school",
+    "createPlan": "Create a plan",
+    "approve": "Approve",
+    "suspend": "Suspend",
+    "reactivate": "Reactivate",
+    "recordPayment": "Record a payment",
+    "paymentHistory": "Payment history",
+    "subscription": "Subscription",
+    "noSubscription": "No subscription",
+    "name": "Name",
+    "status": "Status",
+    "onboardingSource": "Source",
+    "plan": "Plan",
+    "amount": "Amount",
+    "method": "Method",
+    "reference": "Reference",
+    "notes": "Notes",
+    "viewDetails": "View details",
+    "schoolStatus": {
+      "PENDING_APPROVAL": "Pending approval",
+      "ACTIVE": "Active",
+      "SUSPENDED": "Suspended"
+    },
+    "onboarding": {
+      "MANUAL": "Manual",
+      "SELF_SERVICE": "Self-service"
+    },
+    "subscriptionStatus": {
+      "TRIALING": "Trialing",
+      "ACTIVE": "Active",
+      "PAST_DUE": "Past due",
+      "SUSPENDED": "Suspended",
+      "CANCELLED": "Cancelled"
+    },
+    "paymentMethod": {
+      "CASH": "Cash",
+      "MOBILE_MONEY": "Mobile money"
+    }
+  },
+  "signup": {
+    "title": "Sign up your school",
+    "subtitle": "Create your institution's account on the platform",
+    "schoolName": "School name",
+    "address": "Address",
+    "phone": "Phone",
+    "adminSectionTitle": "Administrator account",
+    "plan": "Desired plan",
+    "submit": "Sign up",
+    "success": "Your registration has been received — an administrator will validate your account shortly.",
+    "backToLogin": "Back to login"
   },
   "dashboard": {
     "welcomeBack": "Welcome back, {{name}}!",

@@ -33,13 +33,74 @@
     "attendance": "Présences",
     "grades": "Notes",
     "academicYears": "Années académiques",
-    "school": "École"
+    "school": "École",
+    "platformSchools": "Écoles",
+    "platformPlans": "Plans"
   },
   "roles": {
+    "SUPER_ADMIN": "Super-administrateur",
     "ADMIN": "Administrateur",
     "TEACHER": "Enseignant",
     "STUDENT": "Élève",
     "PARENT": "Parent"
+  },
+  "platform": {
+    "dashboard": "Tableau de bord plateforme",
+    "totalSchools": "Écoles",
+    "pendingSchools": "En attente",
+    "activeSchools": "Actives",
+    "schools": "Écoles",
+    "plans": "Plans",
+    "createSchool": "Créer une école",
+    "createPlan": "Créer un plan",
+    "approve": "Approuver",
+    "suspend": "Suspendre",
+    "reactivate": "Réactiver",
+    "recordPayment": "Enregistrer un paiement",
+    "paymentHistory": "Historique des paiements",
+    "subscription": "Abonnement",
+    "noSubscription": "Aucun abonnement",
+    "name": "Nom",
+    "status": "Statut",
+    "onboardingSource": "Origine",
+    "plan": "Plan",
+    "amount": "Montant",
+    "method": "Méthode",
+    "reference": "Référence",
+    "notes": "Notes",
+    "viewDetails": "Voir le détail",
+    "schoolStatus": {
+      "PENDING_APPROVAL": "En attente de validation",
+      "ACTIVE": "Active",
+      "SUSPENDED": "Suspendue"
+    },
+    "onboarding": {
+      "MANUAL": "Manuel",
+      "SELF_SERVICE": "Self-service"
+    },
+    "subscriptionStatus": {
+      "TRIALING": "Essai",
+      "ACTIVE": "Actif",
+      "PAST_DUE": "Impayé",
+      "SUSPENDED": "Suspendu",
+      "CANCELLED": "Annulé"
+    },
+    "paymentMethod": {
+      "CASH": "Espèces",
+      "MOBILE_MONEY": "Mobile Money"
+    }
+  },
+  "signup": {
+    "title": "Inscrire votre école",
+    "subtitle": "Créez le compte de votre établissement sur la plateforme",
+    "schoolName": "Nom de l'école",
+    "address": "Adresse",
+    "phone": "Téléphone",
+    "adminSectionTitle": "Compte administrateur",
+    "plan": "Plan souhaité",
+    "submit": "S'inscrire",
+    "success": "Votre inscription est enregistrée, un administrateur va valider votre compte sous peu.",
+    "backToLogin": "Retour à la connexion"
   },
   "dashboard": {
     "welcomeBack": "Bon retour, {{name}} !",

@@ -13,12 +13,15 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { to: '/dashboard', labelKey: 'nav.dashboard', roles: ['ADMIN', 'TEACHER', 'STUDENT', 'PARENT'] },
+  { to: '/platform/dashboard', labelKey: 'nav.dashboard', roles: ['SUPER_ADMIN'] },
   { to: '/students', labelKey: 'nav.students', roles: ['ADMIN', 'TEACHER'] },
   { to: '/teachers', labelKey: 'nav.teachers', roles: ['ADMIN'] },
   { to: '/classes', labelKey: 'nav.classes', roles: ['ADMIN'] },
   { to: '/subjects', labelKey: 'nav.subjects', roles: ['ADMIN'] },
   { to: '/attendance', labelKey: 'nav.attendance', roles: ['ADMIN', 'TEACHER'] },
   { to: '/grades', labelKey: 'nav.grades', roles: ['ADMIN', 'TEACHER'] },
+  { to: '/platform/schools', labelKey: 'nav.platformSchools', roles: ['SUPER_ADMIN'] },
+  { to: '/platform/plans', labelKey: 'nav.platformPlans', roles: ['SUPER_ADMIN'] },
 ]
 
 export function AppLayout() {
