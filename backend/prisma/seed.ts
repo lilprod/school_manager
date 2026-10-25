@@ -9,8 +9,59 @@ async function hash(password: string) {
   return bcrypt.hash(password, SALT_ROUNDS);
 }
 
+function addMonths(date: Date, months: number): Date {
+  const result = new Date(date);
+  result.setMonth(result.getMonth() + months);
+  return result;
+}
+
 async function main() {
   console.log('🌱 Démarrage du seed...');
+
+  const superAdmin = await prisma.user.create({
+    data: {
+      schoolId: null,
+      email: 'super.admin@platform.app',
+      passwordHash: await hash(DEMO_PASSWORD),
+      role: 'SUPER_ADMIN',
+      firstName: 'Super',
+      lastName: 'Admin',
+    },
+  });
+
+  const planStarter = await prisma.plan.create({
+    data: {
+      code: 'starter',
+      name: 'Starter',
+      priceAmount: 15000,
+      currency: 'XOF',
+      billingPeriod: 'MONTHLY',
+      maxStudents: 100,
+      maxTeachers: 10,
+      maxClasses: 5,
+    },
+  });
+  const planStandard = await prisma.plan.create({
+    data: {
+      code: 'standard',
+      name: 'Standard',
+      priceAmount: 35000,
+      currency: 'XOF',
+      billingPeriod: 'MONTHLY',
+      maxStudents: 500,
+      maxTeachers: 40,
+      maxClasses: 20,
+    },
+  });
+  const planPremium = await prisma.plan.create({
+    data: {
+      code: 'premium',
+      name: 'Premium',
+      priceAmount: 350000,
+      currency: 'XOF',
+      billingPeriod: 'YEARLY',
+    },
+  });
 
   const school = await prisma.school.create({
     data: {
@@ -18,6 +69,27 @@ async function main() {
       address: '12 rue des Écoles, 75005 Paris',
       phone: '+33 1 23 45 67 89',
       email: 'contact@lycee-victorhugo.fr',
+      status: 'ACTIVE',
+      onboardingSource: 'MANUAL',
+    },
+  });
+
+  const schoolSubscription = await prisma.subscription.create({
+    data: {
+      schoolId: school.id,
+      planId: planStandard.id,
+      status: 'ACTIVE',
+      currentPeriodEnd: addMonths(new Date(), 1),
+    },
+  });
+  await prisma.payment.create({
+    data: {
+      subscriptionId: schoolSubscription.id,
+      amount: planStandard.priceAmount,
+      currency: planStandard.currency,
+      method: 'CASH',
+      recordedById: superAdmin.id,
+      notes: 'Paiement initial - espèces',
     },
   });
 
@@ -238,13 +310,133 @@ async function main() {
     }
   }
 
+  // --- Deuxième école : inscrite en self-service, essai en cours, pas encore payée ---
+  const school2 = await prisma.school.create({
+    data: {
+      name: 'Collège Molière',
+      address: '8 avenue des Lilas, 69003 Lyon',
+      phone: '+33 4 12 34 56 78',
+      email: 'contact@college-moliere.fr',
+      status: 'ACTIVE',
+      onboardingSource: 'SELF_SERVICE',
+    },
+  });
+  await prisma.subscription.create({
+    data: {
+      schoolId: school2.id,
+      planId: planStarter.id,
+      status: 'TRIALING',
+      trialEndsAt: addMonths(new Date(), 1),
+    },
+  });
+
+  const academicYear2 = await prisma.academicYear.create({
+    data: {
+      schoolId: school2.id,
+      label: '2025-2026',
+      startDate: new Date('2025-09-01'),
+      endDate: new Date('2026-06-30'),
+      isCurrent: true,
+    },
+  });
+  const class2 = await prisma.classGroup.create({
+    data: { schoolId: school2.id, name: '6ème A', level: '6ème' },
+  });
+  await prisma.subject.create({
+    data: { schoolId: school2.id, name: 'Mathématiques', code: 'MATH' },
+  });
+
+  const admin2User = await prisma.user.create({
+    data: {
+      schoolId: school2.id,
+      email: 'admin@college-moliere.fr',
+      passwordHash: await hash(DEMO_PASSWORD),
+      role: 'ADMIN',
+      firstName: 'Fatou',
+      lastName: 'Ndiaye',
+    },
+  });
+
+  const teacher2User = await prisma.user.create({
+    data: {
+      schoolId: school2.id,
+      email: 'prof@college-moliere.fr',
+      passwordHash: await hash(DEMO_PASSWORD),
+      role: 'TEACHER',
+      firstName: 'Karim',
+      lastName: 'Haddad',
+    },
+  });
+  await prisma.teacherProfile.create({
+    data: { userId: teacher2User.id, employeeNumber: 'CM-EMP-001' },
+  });
+
+  const school2StudentSeeds = [
+    { firstName: 'Inès', lastName: 'Moreau' },
+    { firstName: 'Adam', lastName: 'Bernard' },
+    { firstName: 'Lina', lastName: 'Rousseau' },
+  ];
+  const school2Students: { profileId: string; firstName: string; lastName: string }[] = [];
+  for (const [index, seed] of school2StudentSeeds.entries()) {
+    const studentUser = await prisma.user.create({
+      data: {
+        schoolId: school2.id,
+        email: `eleve.cm${index + 1}@college-moliere.fr`,
+        passwordHash: await hash(DEMO_PASSWORD),
+        role: 'STUDENT',
+        firstName: seed.firstName,
+        lastName: seed.lastName,
+      },
+    });
+    const studentProfile = await prisma.studentProfile.create({
+      data: { userId: studentUser.id, studentNumber: `CM-STU-${String(index + 1).padStart(4, '0')}` },
+    });
+    await prisma.enrollment.create({
+      data: { studentId: studentProfile.id, classGroupId: class2.id, academicYearId: academicYear2.id },
+    });
+    school2Students.push({ profileId: studentProfile.id, firstName: seed.firstName, lastName: seed.lastName });
+  }
+
+  // --- Scénario clé : parent1 (Lycée Victor Hugo) a aussi un enfant au Collège Molière ---
+  await prisma.parentStudent.create({
+    data: { parentId: parent1.id, studentId: school2Students[0].profileId, relation: 'mère' },
+  });
+
+  // --- Troisième école : inscription self-service en attente de validation ---
+  const school3 = await prisma.school.create({
+    data: {
+      name: 'École Les Flamboyants',
+      status: 'PENDING_APPROVAL',
+      onboardingSource: 'SELF_SERVICE',
+      requestedPlanId: planStarter.id,
+    },
+  });
+  const admin3User = await prisma.user.create({
+    data: {
+      schoolId: school3.id,
+      email: 'admin@lesflamboyants.fr',
+      passwordHash: await hash(DEMO_PASSWORD),
+      role: 'ADMIN',
+      firstName: 'Mamadou',
+      lastName: 'Diop',
+    },
+  });
+
   console.log('✅ Seed terminé.');
   console.log('');
   console.log('Comptes de démonstration (mot de passe commun) :', DEMO_PASSWORD);
-  console.log(`  Admin   : ${adminUser.email}`);
-  console.log(`  Prof.   : ${teacherMathUser.email}, ${teacherFrenchUser.email}`);
-  console.log(`  Élève   : ${students[0].profileId ? 'eleve1@ecole.fr .. eleve8@ecole.fr' : ''}`);
-  console.log(`  Parent  : ${parent1User.email}, ${parent2User.email}`);
+  console.log(`  Super-admin : ${superAdmin.email}`);
+  console.log(`  Admin       : ${adminUser.email}`);
+  console.log(`  Prof.       : ${teacherMathUser.email}, ${teacherFrenchUser.email}`);
+  console.log(`  Élève       : ${students[0].profileId ? 'eleve1@ecole.fr .. eleve8@ecole.fr' : ''}`);
+  console.log(`  Parent      : ${parent1User.email}, ${parent2User.email}`);
+  console.log('');
+  console.log('Écoles :');
+  console.log(`  ${school.name} — ${school.status} (plan ${planStandard.code}, payée)`);
+  console.log(`  ${school2.name} — ${school2.status} (plan ${planStarter.code}, essai en cours) — admin : ${admin2User.email}`);
+  console.log(`  ${school3.name} — ${school3.status} (en attente de validation) — admin : ${admin3User.email}`);
+  console.log('');
+  console.log(`⚠️  ${parent1User.email} a des enfants dans 2 écoles différentes (${school.name} et ${school2.name}) — vérifier GET /students/my-children.`);
 }
 
 main()
