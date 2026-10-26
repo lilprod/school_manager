@@ -28,6 +28,9 @@ import { EvaluationsModule } from './evaluations/evaluations.module.js';
 import { MessagesModule } from './messages/messages.module.js';
 import { AnnouncementsModule } from './announcements/announcements.module.js';
 import { MeetingsModule } from './meetings/meetings.module.js';
+import { FeeStructuresModule } from './fee-structures/fee-structures.module.js';
+import { InvoicesModule } from './invoices/invoices.module.js';
+import { ExpensesModule } from './expenses/expenses.module.js';
 
 @Module({
   imports: [
@@ -57,6 +60,9 @@ import { MeetingsModule } from './meetings/meetings.module.js';
     MessagesModule,
     AnnouncementsModule,
     MeetingsModule,
+    FeeStructuresModule,
+    InvoicesModule,
+    ExpensesModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },
