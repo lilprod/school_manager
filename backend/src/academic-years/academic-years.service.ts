@@ -31,6 +31,18 @@ export class AcademicYearsService {
     });
   }
 
+  /** Années où l'un des enfants du parent est inscrit, toutes écoles confondues. */
+  findAllForParent(parentUserId: string) {
+    return this.prisma.academicYear.findMany({
+      where: {
+        enrollments: {
+          some: { student: { guardians: { some: { parent: { userId: parentUserId } } } } },
+        },
+      },
+      orderBy: { startDate: 'desc' },
+    });
+  }
+
   async findOne(schoolId: string, id: string) {
     const year = await this.prisma.academicYear.findFirst({ where: { id, schoolId } });
     if (!year) {

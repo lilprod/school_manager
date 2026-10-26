@@ -28,8 +28,14 @@ export class GradingController {
     @Query('classGroupId') classGroupId?: string,
     @Query('subjectId') subjectId?: string,
     @Query('academicYearId') academicYearId?: string,
+    @Query('termId') termId?: string,
   ) {
-    return this.gradingService.findAssessments(requireSchoolId(user), { classGroupId, subjectId, academicYearId });
+    return this.gradingService.findAssessments(requireSchoolId(user), {
+      classGroupId,
+      subjectId,
+      academicYearId,
+      termId,
+    });
   }
 
   @Get('assessments/:id')
@@ -83,7 +89,8 @@ export class GradingController {
     @CurrentUser() user: AuthenticatedUser,
     @Param('studentId') studentId: string,
     @Query('academicYearId') academicYearId: string,
+    @Query('termId') termId?: string,
   ) {
-    return this.gradingService.reportCard(user.schoolId, user, studentId, academicYearId);
+    return this.gradingService.reportCard(user.schoolId, user, studentId, academicYearId, termId);
   }
 }

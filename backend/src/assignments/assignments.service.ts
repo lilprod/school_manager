@@ -1,9 +1,16 @@
-import { ConflictException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { StudentAccessService, type Requester } from '../common/access/student-access.service.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import type { CreateAssignmentDto } from './dto/create-assignment.dto.js';
 import type { GradeSubmissionDto } from './dto/grade-submission.dto.js';
 import type { SubmitAssignmentDto } from './dto/submit-assignment.dto.js';
+import type { UpdateAssignmentDto } from './dto/update-assignment.dto.js';
 
 const assignmentInclude = {
   subject: true,
@@ -38,6 +45,7 @@ export class AssignmentsService {
         classGroupId: dto.classGroupId,
         academicYearId: dto.academicYearId,
         dueDate: new Date(dto.dueDate),
+        maxScore: dto.maxScore ?? 20,
         createdById: teacherId,
       },
       include: assignmentInclude,
@@ -66,6 +74,34 @@ export class AssignmentsService {
       throw new NotFoundException('Devoir introuvable.');
     }
     return assignment;
+  }
+
+  async update(schoolId: string, userId: string, id: string, dto: UpdateAssignmentDto) {
+    const teacherId = await this.resolveTeacherId(schoolId, userId);
+    const assignment = await this.findOne(schoolId, id);
+    if (assignment.createdById !== teacherId) {
+      throw new ForbiddenException('Vous ne pouvez modifier que vos propres devoirs.');
+    }
+
+    if (dto.maxScore !== undefined) {
+      const above = await this.prisma.assignmentSubmission.findFirst({
+        where: { assignmentId: id, grade: { gt: dto.maxScore } },
+      });
+      if (above) {
+        throw new BadRequestException('Une copie déjà corrigée dépasse cette note maximale.');
+      }
+    }
+
+    return this.prisma.assignment.update({
+      where: { id },
+      data: {
+        title: dto.title,
+        description: dto.description,
+        maxScore: dto.maxScore,
+        dueDate: dto.dueDate ? new Date(dto.dueDate) : undefined,
+      },
+      include: assignmentInclude,
+    });
   }
 
   async remove(schoolId: string, userId: string, id: string) {
@@ -106,6 +142,7 @@ export class AssignmentsService {
       throw new ForbiddenException("Vous n'êtes pas inscrit dans la classe concernée par ce devoir.");
     }
 
+    const now = new Date();
     const existing = await this.prisma.assignmentSubmission.findUnique({
       where: { assignmentId_studentId: { assignmentId, studentId: student.id } },
     });
@@ -116,13 +153,13 @@ export class AssignmentsService {
       }
       return this.prisma.assignmentSubmission.update({
         where: { id: existing.id },
-        data: { content: dto.content, submittedAt: new Date() },
+        data: { content: dto.content, submittedAt: now, isLate: now > assignment.dueDate },
         include: submissionInclude,
       });
     }
 
     return this.prisma.assignmentSubmission.create({
-      data: { assignmentId, studentId: student.id, content: dto.content },
+      data: { assignmentId, studentId: student.id, content: dto.content, submittedAt: now, isLate: now > assignment.dueDate },
       include: submissionInclude,
     });
   }
@@ -139,6 +176,12 @@ export class AssignmentsService {
     }
     if (submission.assignment.createdById !== teacherId) {
       throw new ForbiddenException('Vous ne pouvez corriger que les devoirs que vous avez créés.');
+    }
+
+    if (dto.grade > submission.assignment.maxScore) {
+      throw new BadRequestException(
+        `La note de ${dto.grade} dépasse le maximum autorisé (${submission.assignment.maxScore}).`,
+      );
     }
 
     return this.prisma.assignmentSubmission.update({

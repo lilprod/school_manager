@@ -32,4 +32,15 @@ export class CreateAssessmentDto {
   @ApiProperty()
   @IsDateString()
   date!: string;
+
+  @ApiProperty({ required: false, default: 1, description: 'Poids de l\'évaluation dans la moyenne de la matière' })
+  @IsOptional()
+  @IsNumber()
+  @Min(0.1)
+  coefficient?: number;
+
+  @ApiProperty({ required: false })
+  @IsOptional()
+  @IsString()
+  termId?: string;
 }

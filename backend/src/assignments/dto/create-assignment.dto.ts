@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsOptional, IsString } from 'class-validator';
+import { IsDateString, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
 export class CreateAssignmentDto {
   @ApiProperty()
@@ -26,4 +26,10 @@ export class CreateAssignmentDto {
   @ApiProperty()
   @IsDateString()
   dueDate!: string;
+
+  @ApiProperty({ required: false, default: 20, description: 'Note maximale du devoir' })
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  maxScore?: number;
 }

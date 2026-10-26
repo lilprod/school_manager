@@ -23,6 +23,9 @@ export class AcademicYearsController {
 
   @Get()
   findAll(@CurrentUser() user: AuthenticatedUser) {
+    if (user.role === 'PARENT') {
+      return this.academicYearsService.findAllForParent(user.id);
+    }
     return this.academicYearsService.findAll(requireSchoolId(user));
   }
 

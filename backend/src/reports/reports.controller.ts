@@ -69,8 +69,9 @@ export class ReportsController {
     @Param('studentId') studentId: string,
     @Query('academicYearId') academicYearId: string,
     @Res() res: Response,
+    @Query('termId') termId?: string,
   ) {
-    const buffer = await this.reportsService.reportCardPdf(user.schoolId, user, studentId, academicYearId);
+    const buffer = await this.reportsService.reportCardPdf(user.schoolId, user, studentId, academicYearId, termId);
     res.set({
       'Content-Type': 'application/pdf',
       'Content-Disposition': `inline; filename="bulletin-${studentId}.pdf"`,

@@ -103,6 +103,26 @@ async function main() {
     },
   });
 
+  const termConfigs = [
+    { name: 'Trimestre 1', startDate: '2025-09-01', endDate: '2025-12-20' },
+    { name: 'Trimestre 2', startDate: '2026-01-05', endDate: '2026-03-31' },
+    { name: 'Trimestre 3', startDate: '2026-04-01', endDate: '2026-06-30' },
+  ];
+  const terms = [];
+  for (const term of termConfigs) {
+    terms.push(
+      await prisma.term.create({
+        data: {
+          schoolId: school.id,
+          academicYearId: academicYear.id,
+          name: term.name,
+          startDate: new Date(term.startDate),
+          endDate: new Date(term.endDate),
+        },
+      }),
+    );
+  }
+
   const classA = await prisma.classGroup.create({
     data: { schoolId: school.id, name: '6ème A', level: '6ème' },
   });
@@ -111,16 +131,16 @@ async function main() {
   });
 
   const subjectMath = await prisma.subject.create({
-    data: { schoolId: school.id, name: 'Mathématiques', code: 'MATH' },
+    data: { schoolId: school.id, name: 'Mathématiques', code: 'MATH', coefficient: 3 },
   });
   const subjectFrench = await prisma.subject.create({
-    data: { schoolId: school.id, name: 'Français', code: 'FR' },
+    data: { schoolId: school.id, name: 'Français', code: 'FR', coefficient: 3 },
   });
   const subjectHistory = await prisma.subject.create({
-    data: { schoolId: school.id, name: 'Histoire-Géographie', code: 'HG' },
+    data: { schoolId: school.id, name: 'Histoire-Géographie', code: 'HG', coefficient: 2 },
   });
   const subjectScience = await prisma.subject.create({
-    data: { schoolId: school.id, name: 'Sciences', code: 'SCI' },
+    data: { schoolId: school.id, name: 'Sciences', code: 'SCI', coefficient: 2 },
   });
 
   const adminUser = await prisma.user.create({
@@ -279,10 +299,10 @@ async function main() {
   }
 
   const assessmentConfigs = [
-    { subject: subjectMath, classGroup: classA, title: 'Contrôle - Fractions' },
-    { subject: subjectFrench, classGroup: classA, title: 'Dissertation - Le romantisme' },
-    { subject: subjectMath, classGroup: classB, title: 'Contrôle - Géométrie' },
-    { subject: subjectFrench, classGroup: classB, title: 'Dictée et grammaire' },
+    { subject: subjectMath, classGroup: classA, title: 'Contrôle - Fractions', term: terms[0], coefficient: 1 },
+    { subject: subjectFrench, classGroup: classA, title: 'Dissertation - Le romantisme', term: terms[0], coefficient: 2 },
+    { subject: subjectMath, classGroup: classB, title: 'Contrôle - Géométrie', term: terms[1], coefficient: 1 },
+    { subject: subjectFrench, classGroup: classB, title: 'Dictée et grammaire', term: terms[1], coefficient: 1 },
   ];
 
   for (const config of assessmentConfigs) {
@@ -294,6 +314,8 @@ async function main() {
         classGroupId: config.classGroup.id,
         academicYearId: academicYear.id,
         maxScore: 20,
+        coefficient: config.coefficient,
+        termId: config.term.id,
         date: new Date(today.getFullYear(), today.getMonth(), today.getDate() - 10),
       },
     });

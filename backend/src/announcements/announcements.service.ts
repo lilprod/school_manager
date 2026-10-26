@@ -73,6 +73,50 @@ export class AnnouncementsService {
     });
   }
 
+  /**
+   * Un parent peut avoir des enfants dans plusieurs écoles : on agrège les
+   * annonces de chacune (audience ALL, PARENT, ou classe d'un de ses enfants).
+   */
+  async findAllForParent(user: AuthenticatedUser) {
+    const children = await this.prisma.studentProfile.findMany({
+      where: { guardians: { some: { parent: { userId: user.id } } } },
+      include: {
+        user: { select: { schoolId: true } },
+        enrollments: { orderBy: { createdAt: 'desc' }, take: 1 },
+      },
+    });
+
+    const classGroupIdsBySchool = new Map<string, string[]>();
+    for (const child of children) {
+      const schoolId = child.user.schoolId;
+      if (!schoolId) {
+        continue;
+      }
+      const ids = classGroupIdsBySchool.get(schoolId) ?? [];
+      ids.push(...child.enrollments.map((e) => e.classGroupId));
+      classGroupIdsBySchool.set(schoolId, ids);
+    }
+
+    if (classGroupIdsBySchool.size === 0) {
+      return [];
+    }
+
+    return this.prisma.announcement.findMany({
+      where: {
+        OR: Array.from(classGroupIdsBySchool, ([schoolId, classGroupIds]) => ({
+          schoolId,
+          OR: [
+            { audience: AnnouncementAudience.ALL },
+            { audience: AnnouncementAudience.PARENT },
+            ...(classGroupIds.length > 0 ? [{ classGroupId: { in: classGroupIds } }] : []),
+          ],
+        })),
+      },
+      include: { author: { select: authorSelect }, school: { select: { id: true, name: true } } },
+      orderBy: { publishedAt: 'desc' },
+    });
+  }
+
   async remove(schoolId: string, id: string) {
     const announcement = await this.prisma.announcement.findFirst({ where: { id, schoolId } });
     if (!announcement) {

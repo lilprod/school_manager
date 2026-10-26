@@ -4,8 +4,9 @@ import { PrismaService } from '../prisma/prisma.service.js';
 import type { BulkEnterGradesDto } from './dto/bulk-enter-grades.dto.js';
 import type { CreateAssessmentDto } from './dto/create-assessment.dto.js';
 import type { UpdateAssessmentDto } from './dto/update-assessment.dto.js';
+import { computeReportCard } from './report-card.js';
 
-const assessmentInclude = { subject: true, classGroup: true, academicYear: true };
+const assessmentInclude = { subject: true, classGroup: true, academicYear: true, term: true };
 
 @Injectable()
 export class GradingService {
@@ -16,6 +17,9 @@ export class GradingService {
 
   async createAssessment(schoolId: string, dto: CreateAssessmentDto) {
     await this.assertClassGroupInSchool(schoolId, dto.classGroupId);
+    if (dto.termId) {
+      await this.assertTermInYear(schoolId, dto.termId, dto.academicYearId);
+    }
 
     return this.prisma.assessment.create({
       data: {
@@ -25,13 +29,15 @@ export class GradingService {
         classGroupId: dto.classGroupId,
         academicYearId: dto.academicYearId,
         maxScore: dto.maxScore ?? 20,
+        coefficient: dto.coefficient ?? 1,
+        termId: dto.termId,
         date: new Date(dto.date),
       },
       include: assessmentInclude,
     });
   }
 
-  findAssessments(schoolId: string, filters: { classGroupId?: string; subjectId?: string; academicYearId?: string }) {
+  findAssessments(schoolId: string, filters: { classGroupId?: string; subjectId?: string; academicYearId?: string; termId?: string }) {
     return this.prisma.assessment.findMany({
       where: { classGroup: { schoolId }, ...filters },
       include: assessmentInclude,
@@ -51,7 +57,10 @@ export class GradingService {
   }
 
   async updateAssessment(schoolId: string, id: string, dto: UpdateAssessmentDto) {
-    await this.findAssessment(schoolId, id);
+    const existing = await this.findAssessment(schoolId, id);
+    if (dto.termId) {
+      await this.assertTermInYear(schoolId, dto.termId, existing.academicYearId);
+    }
     return this.prisma.assessment.update({
       where: { id },
       data: { ...dto, date: dto.date ? new Date(dto.date) : undefined },
@@ -115,52 +124,39 @@ export class GradingService {
     });
   }
 
-  async reportCard(schoolId: string | null, requester: Requester, studentId: string, academicYearId: string) {
+  async reportCard(
+    schoolId: string | null,
+    requester: Requester,
+    studentId: string,
+    academicYearId: string,
+    termId?: string,
+  ) {
     await this.studentAccess.assertCanView(schoolId, requester, studentId);
 
     const grades = await this.prisma.grade.findMany({
-      where: { studentId, assessment: { academicYearId } },
+      where: { studentId, assessment: { academicYearId, ...(termId ? { termId } : {}) } },
       include: { assessment: { include: { subject: true } } },
     });
 
-    const bySubject = new Map<string, { subjectName: string; ratios: number[] }>();
-    for (const grade of grades) {
-      const subjectId = grade.assessment.subjectId;
-      const ratio = grade.score / grade.assessment.maxScore;
-      const entry = bySubject.get(subjectId) ?? {
+    const result = computeReportCard(
+      grades.map((grade) => ({
+        score: grade.score,
+        maxScore: grade.assessment.maxScore,
+        assessmentCoefficient: grade.assessment.coefficient,
+        subjectId: grade.assessment.subjectId,
         subjectName: grade.assessment.subject.name,
-        ratios: [],
-      };
-      entry.ratios.push(ratio);
-      bySubject.set(subjectId, entry);
-    }
+        subjectCoefficient: grade.assessment.subject.coefficient,
+      })),
+    );
 
-    const subjects = Array.from(bySubject.entries()).map(([subjectId, { subjectName, ratios }]) => ({
-      subjectId,
-      subjectName,
-      average: this.round(this.average(ratios) * 20),
-      assessmentCount: ratios.length,
-    }));
-
-    const overallRatios = grades.map((g) => g.score / g.assessment.maxScore);
-
-    return {
-      studentId,
-      academicYearId,
-      subjects,
-      overallAverage: this.round(this.average(overallRatios) * 20),
-    };
+    return { studentId, academicYearId, termId: termId ?? null, ...result };
   }
 
-  private average(values: number[]): number {
-    if (values.length === 0) {
-      return 0;
+  private async assertTermInYear(schoolId: string, termId: string, academicYearId: string) {
+    const term = await this.prisma.term.findFirst({ where: { id: termId, schoolId, academicYearId } });
+    if (!term) {
+      throw new NotFoundException('Trimestre introuvable pour cette année académique.');
     }
-    return values.reduce((sum, v) => sum + v, 0) / values.length;
-  }
-
-  private round(value: number): number {
-    return Math.round(value * 100) / 100;
   }
 
   private async assertClassGroupInSchool(schoolId: string, classGroupId: string) {

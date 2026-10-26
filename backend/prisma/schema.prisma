@@ -107,6 +107,7 @@ model School {
   subscription  Subscription?
 
   rooms         Room[]
+  terms         Term[]
   announcements Announcement[]
   feeStructures FeeStructure[]
   expenses      Expense[]
@@ -125,6 +126,7 @@ model AcademicYear {
   enrollments        Enrollment[]
   teacherAssignments TeacherAssignment[]
   assessments        Assessment[]
+  terms              Term[]
 
   timetableSlots TimetableSlot[]
   syllabi        Syllabus[]
@@ -157,11 +159,12 @@ model ClassGroup {
 }
 
 model Subject {
-  id       String @id @default(cuid())
-  schoolId String
-  school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  name     String
-  code     String
+  id          String @id @default(cuid())
+  schoolId    String
+  school      School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  name        String
+  code        String
+  coefficient Float  @default(1)
 
   teacherAssignments TeacherAssignment[]
   attendances        Attendance[]
@@ -331,10 +334,31 @@ model Assessment {
   academicYearId String
   academicYear   AcademicYear   @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
   maxScore       Float          @default(20)
+  coefficient    Float          @default(1)
+  termId         String?
+  term           Term?          @relation(fields: [termId], references: [id], onDelete: SetNull)
   date           DateTime
   createdAt      DateTime       @default(now())
 
   grades Grade[]
+
+  @@index([termId])
+}
+
+model Term {
+  id             String       @id @default(cuid())
+  schoolId       String
+  school         School       @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  academicYearId String
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  name           String
+  startDate      DateTime
+  endDate        DateTime
+  createdAt      DateTime     @default(now())
+
+  assessments Assessment[]
+
+  @@unique([academicYearId, name])
 }
 
 model Grade {
@@ -460,6 +484,7 @@ model Assignment {
   academicYearId String
   academicYear   AcademicYear   @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
   dueDate        DateTime
+  maxScore       Float          @default(20)
   createdById    String
   createdBy      TeacherProfile @relation(fields: [createdById], references: [id], onDelete: Cascade)
   createdAt      DateTime       @default(now())
@@ -475,6 +500,7 @@ model AssignmentSubmission {
   student      StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
   content      String?
   submittedAt  DateTime       @default(now())
+  isLate       Boolean        @default(false)
   grade        Float?
   feedback     String?
 

@@ -9,6 +9,7 @@ import { AssignmentsService } from './assignments.service.js';
 import { CreateAssignmentDto } from './dto/create-assignment.dto.js';
 import { GradeSubmissionDto } from './dto/grade-submission.dto.js';
 import { SubmitAssignmentDto } from './dto/submit-assignment.dto.js';
+import { UpdateAssignmentDto } from './dto/update-assignment.dto.js';
 
 @ApiTags('assignments')
 @ApiBearerAuth()
@@ -38,6 +39,16 @@ export class AssignmentsController {
   @Get(':id')
   findOne(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
     return this.assignmentsService.findOne(requireSchoolId(user), id);
+  }
+
+  @Roles(Role.TEACHER)
+  @Patch(':id')
+  update(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @Body() dto: UpdateAssignmentDto,
+  ) {
+    return this.assignmentsService.update(requireSchoolId(user), user.id, id, dto);
   }
 
   @Roles(Role.TEACHER)

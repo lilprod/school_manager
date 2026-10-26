@@ -103,8 +103,10 @@ export class ReportsService {
     requester: Requester,
     studentId: string,
     academicYearId: string,
+    termId?: string,
   ): Promise<Buffer> {
-    const reportCard = await this.gradingService.reportCard(schoolId, requester, studentId, academicYearId);
+    const reportCard = await this.gradingService.reportCard(schoolId, requester, studentId, academicYearId, termId);
+    const term = termId ? await this.prisma.term.findUnique({ where: { id: termId } }) : null;
 
     const student = await this.prisma.studentProfile.findUnique({
       where: { id: studentId },
@@ -123,19 +125,19 @@ export class ReportsService {
 
       doc.fontSize(16).font('Helvetica-Bold').text(schoolName, { align: 'center' });
       doc.moveDown(0.5);
-      doc.fontSize(12).font('Helvetica').text('Bulletin de notes', { align: 'center' });
+      doc.fontSize(12).font('Helvetica').text(term ? `Bulletin de notes — ${term.name}` : 'Bulletin de notes', { align: 'center' });
       doc.moveDown(1.5);
       doc.fontSize(12).font('Helvetica-Bold').text(`Élève : ${studentName}`);
       doc.moveDown(1);
 
       doc.fontSize(11).font('Helvetica-Bold');
-      doc.text('Matière', 40, doc.y, { continued: true, width: 300 });
+      doc.text('Matière (coef.)', 40, doc.y, { continued: true, width: 300 });
       doc.text('Moyenne / 20', { align: 'right' });
       doc.moveDown(0.5);
       doc.font('Helvetica');
 
       for (const subject of reportCard.subjects) {
-        doc.text(subject.subjectName, 40, doc.y, { continued: true, width: 300 });
+        doc.text(`${subject.subjectName} (${subject.coefficient})`, 40, doc.y, { continued: true, width: 300 });
         doc.text(String(subject.average), { align: 'right' });
       }
 

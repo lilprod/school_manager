@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
@@ -21,16 +21,11 @@ export class AnnouncementsController {
   }
 
   @Get()
-  findAll(@CurrentUser() user: AuthenticatedUser, @Query('schoolId') schoolIdQuery?: string) {
-    // Un ADMIN/TEACHER/STUDENT a toujours un schoolId. Un PARENT peut avoir des
-    // enfants dans plusieurs écoles et doit préciser laquelle consulter.
-    const schoolId = user.schoolId ?? schoolIdQuery;
-    if (!schoolId) {
-      throw new BadRequestException(
-        'Le paramètre schoolId est requis pour consulter les annonces d\'une école donnée.',
-      );
+  findAll(@CurrentUser() user: AuthenticatedUser) {
+    if (user.role === 'PARENT') {
+      return this.announcementsService.findAllForParent(user);
     }
-    return this.announcementsService.findAllForUser(schoolId, user);
+    return this.announcementsService.findAllForUser(requireSchoolId(user), user);
   }
 
   @Roles(Role.ADMIN)
