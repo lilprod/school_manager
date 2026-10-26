@@ -22,6 +22,9 @@ import { TimetableModule } from './timetable/timetable.module.js';
 import { SyllabiModule } from './syllabi/syllabi.module.js';
 import { LessonPlansModule } from './lesson-plans/lesson-plans.module.js';
 import { AssignmentsModule } from './assignments/assignments.module.js';
+import { StaffAttendanceModule } from './staff-attendance/staff-attendance.module.js';
+import { ContractsModule } from './contracts/contracts.module.js';
+import { EvaluationsModule } from './evaluations/evaluations.module.js';
 
 @Module({
   imports: [
@@ -45,6 +48,9 @@ import { AssignmentsModule } from './assignments/assignments.module.js';
     SyllabiModule,
     LessonPlansModule,
     AssignmentsModule,
+    StaffAttendanceModule,
+    ContractsModule,
+    EvaluationsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },
