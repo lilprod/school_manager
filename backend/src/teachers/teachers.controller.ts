@@ -1,4 +1,16 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
@@ -9,6 +21,9 @@ import { AssignTeacherDto } from './dto/assign-teacher.dto.js';
 import { CreateTeacherDto } from './dto/create-teacher.dto.js';
 import { UpdateTeacherDto } from './dto/update-teacher.dto.js';
 import { TeachersService } from './teachers.service.js';
+
+const ALLOWED_PHOTO_MIME_TYPES = ['image/jpeg', 'image/png'];
+const MAX_PHOTO_SIZE = 2 * 1024 * 1024;
 
 @ApiTags('teachers')
 @ApiBearerAuth()
@@ -60,5 +75,27 @@ export class TeachersController {
   @Delete(':id')
   remove(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
     return this.teachersService.remove(requireSchoolId(user), id);
+  }
+
+  @Roles(Role.ADMIN)
+  @Post(':id/photo')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      limits: { fileSize: MAX_PHOTO_SIZE },
+      fileFilter: (_req, file, callback) => {
+        if (!ALLOWED_PHOTO_MIME_TYPES.includes(file.mimetype)) {
+          callback(new BadRequestException('Seules les images JPEG et PNG sont autorisées.'), false);
+          return;
+        }
+        callback(null, true);
+      },
+    }),
+  )
+  uploadPhoto(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id') id: string,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.teachersService.uploadPhoto(requireSchoolId(user), id, file);
   }
 }

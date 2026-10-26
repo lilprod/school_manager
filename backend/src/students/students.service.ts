@@ -1,6 +1,9 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { extname, join } from 'node:path';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
+import PDFDocument from 'pdfkit';
 import { PrismaService } from '../prisma/prisma.service.js';
 import type { CreateStudentDto } from './dto/create-student.dto.js';
 import type { LinkGuardianDto } from './dto/link-guardian.dto.js';
@@ -8,6 +11,7 @@ import type { TransferStudentDto } from './dto/transfer-student.dto.js';
 import type { UpdateStudentDto } from './dto/update-student.dto.js';
 
 const SALT_ROUNDS = 10;
+const PHOTOS_DIR = join(process.cwd(), 'uploads', 'photos');
 
 const studentInclude = {
   user: true,
@@ -77,7 +81,7 @@ export class StudentsService {
   async findAll(schoolId: string, classGroupId?: string) {
     const students = await this.prisma.studentProfile.findMany({
       where: {
-        user: { schoolId },
+        user: { schoolId, isActive: true },
         ...(classGroupId
           ? { enrollments: { some: { classGroupId } } }
           : {}),
@@ -190,6 +194,104 @@ export class StudentsService {
       throw new NotFoundException('Élève introuvable.');
     }
     await this.prisma.user.update({ where: { id: student.userId }, data: { isActive: false } });
+  }
+
+  async graduate(schoolId: string, id: string) {
+    const student = await this.prisma.studentProfile.findFirst({
+      where: { id, user: { schoolId } },
+      include: { enrollments: { orderBy: { createdAt: 'desc' as const }, take: 1 } },
+    });
+    if (!student) {
+      throw new NotFoundException('Élève introuvable.');
+    }
+
+    const latestEnrollment = student.enrollments[0];
+
+    await this.prisma.$transaction([
+      ...(latestEnrollment
+        ? [this.prisma.enrollment.update({ where: { id: latestEnrollment.id }, data: { status: 'graduated' } })]
+        : []),
+      this.prisma.user.update({ where: { id: student.userId }, data: { isActive: false } }),
+    ]);
+  }
+
+  async uploadPhoto(schoolId: string, id: string, file: Express.Multer.File) {
+    const student = await this.prisma.studentProfile.findFirst({ where: { id, user: { schoolId } } });
+    if (!student) {
+      throw new NotFoundException('Élève introuvable.');
+    }
+    if (!file) {
+      throw new BadRequestException('Aucun fichier fourni.');
+    }
+
+    if (!existsSync(PHOTOS_DIR)) {
+      mkdirSync(PHOTOS_DIR, { recursive: true });
+    }
+
+    const filename = `${student.id}-${Date.now()}${extname(file.originalname)}`;
+    writeFileSync(join(PHOTOS_DIR, filename), file.buffer);
+    const photoUrl = `/uploads/photos/${filename}`;
+
+    await this.prisma.user.update({ where: { id: student.userId }, data: { photoUrl } });
+
+    return this.findOne(schoolId, id);
+  }
+
+  async generateIdCardPdf(schoolId: string, id: string): Promise<Buffer> {
+    const student = await this.prisma.studentProfile.findFirst({
+      where: { id, user: { schoolId } },
+      include: {
+        user: { include: { school: true } },
+        enrollments: {
+          orderBy: { createdAt: 'desc' as const },
+          take: 1,
+          include: { classGroup: true },
+        },
+      },
+    });
+    if (!student) {
+      throw new NotFoundException('Élève introuvable.');
+    }
+
+    const schoolName = student.user.school?.name ?? 'École';
+    const className = student.enrollments[0]?.classGroup?.name ?? 'N/A';
+    const photoPath = student.user.photoUrl
+      ? join(process.cwd(), student.user.photoUrl.replace(/^\//, ''))
+      : null;
+
+    return new Promise<Buffer>((resolve, reject) => {
+      const doc = new PDFDocument({ size: [240, 153], margin: 10 });
+      const chunks: Buffer[] = [];
+      doc.on('data', (chunk: Buffer) => chunks.push(chunk));
+      doc.on('end', () => resolve(Buffer.concat(chunks)));
+      doc.on('error', (error: Error) => reject(error));
+
+      doc.fontSize(10).font('Helvetica-Bold').text(schoolName, 10, 10, { width: 220, align: 'center' });
+      doc.moveDown(0.5);
+      doc.fontSize(8).font('Helvetica').text("CARTE D'ÉLÈVE", { width: 220, align: 'center' });
+
+      const textX = photoPath && existsSync(photoPath) ? 90 : 10;
+      let y = 45;
+      doc.fontSize(9).font('Helvetica-Bold').text(`${student.user.firstName} ${student.user.lastName}`, textX, y, {
+        width: 220 - textX,
+      });
+      y += 20;
+      doc.fontSize(8).font('Helvetica').text(`N° élève: ${student.studentNumber}`, textX, y, {
+        width: 220 - textX,
+      });
+      y += 15;
+      doc.text(`Classe: ${className}`, textX, y, { width: 220 - textX });
+
+      if (photoPath && existsSync(photoPath)) {
+        try {
+          doc.image(photoPath, 10, 45, { fit: [70, 80] });
+        } catch {
+          // Corrupted or unreadable image file: skip it rather than fail the whole PDF.
+        }
+      }
+
+      doc.end();
+    });
   }
 
   private sanitize(student: { user: { passwordHash: string } & Record<string, unknown> } & Record<string, unknown>) {

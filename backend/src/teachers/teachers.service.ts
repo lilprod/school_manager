@@ -1,4 +1,6 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { extname, join } from 'node:path';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../prisma/prisma.service.js';
@@ -7,6 +9,7 @@ import type { CreateTeacherDto } from './dto/create-teacher.dto.js';
 import type { UpdateTeacherDto } from './dto/update-teacher.dto.js';
 
 const SALT_ROUNDS = 10;
+const PHOTOS_DIR = join(process.cwd(), 'uploads', 'photos');
 
 const teacherInclude = {
   user: true,
@@ -137,6 +140,28 @@ export class TeachersService {
       throw new NotFoundException('Enseignant introuvable.');
     }
     await this.prisma.user.update({ where: { id: teacher.userId }, data: { isActive: false } });
+  }
+
+  async uploadPhoto(schoolId: string, id: string, file: Express.Multer.File) {
+    const teacher = await this.prisma.teacherProfile.findFirst({ where: { id, user: { schoolId } } });
+    if (!teacher) {
+      throw new NotFoundException('Enseignant introuvable.');
+    }
+    if (!file) {
+      throw new BadRequestException('Aucun fichier fourni.');
+    }
+
+    if (!existsSync(PHOTOS_DIR)) {
+      mkdirSync(PHOTOS_DIR, { recursive: true });
+    }
+
+    const filename = `${teacher.id}-${Date.now()}${extname(file.originalname)}`;
+    writeFileSync(join(PHOTOS_DIR, filename), file.buffer);
+    const photoUrl = `/uploads/photos/${filename}`;
+
+    await this.prisma.user.update({ where: { id: teacher.userId }, data: { photoUrl } });
+
+    return this.findOne(schoolId, id);
   }
 
   private sanitize(teacher: { user: { passwordHash: string } & Record<string, unknown> } & Record<string, unknown>) {
