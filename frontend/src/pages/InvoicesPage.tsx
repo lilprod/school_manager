@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { fetchClassGroups } from '../api/academic'
@@ -154,8 +154,8 @@ export default function InvoicesPage() {
           </thead>
           <tbody>
             {invoices.data?.map((invoice) => (
-              <>
-                <tr key={invoice.id} className="border-t border-slate-100 dark:border-slate-800">
+              <Fragment key={invoice.id}>
+                <tr className="border-t border-slate-100 dark:border-slate-800">
                   <td className="py-2 text-slate-900 dark:text-white">
                     {invoice.student
                       ? `${invoice.student.user.firstName} ${invoice.student.user.lastName}`
@@ -185,7 +185,7 @@ export default function InvoicesPage() {
                   </td>
                 </tr>
                 {payingInvoiceId === invoice.id && (
-                  <tr key={`${invoice.id}-form`} className="border-t border-slate-100 dark:border-slate-800">
+                  <tr className="border-t border-slate-100 dark:border-slate-800">
                     <td colSpan={7} className="py-3">
                       <form
                         onSubmit={paymentForm.handleSubmit((values) => paymentMutation.mutate(values))}
@@ -220,7 +220,7 @@ export default function InvoicesPage() {
                     </td>
                   </tr>
                 )}
-              </>
+              </Fragment>
             ))}
           </tbody>
         </table>

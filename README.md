@@ -14,6 +14,7 @@ Voir [Roadmap](#roadmap--prochaines-phases) pour le périmètre complet prévu
 | Backend | NestJS (TypeScript, ESM), Prisma ORM, PostgreSQL |
 | Authentification | JWT (access + refresh tokens rotatifs), RBAC |
 | Rate-limiting | `@nestjs/throttler` (inscription self-service) |
+| Fichiers / PDF | `multer` (upload photo), `pdfkit` (carte d'élève, bulletin PDF) |
 | Frontend | React 19 + Vite, TypeScript, Tailwind CSS v4 |
 | État / données | Zustand (auth), TanStack Query (données serveur) |
 | Formulaires | React Hook Form + Zod |
@@ -145,20 +146,47 @@ pour illustrer le support des parents multi-écoles.
 - **Parents multi-écoles** : un même parent peut consulter les données de
   ses enfants scolarisés dans des écoles différentes
 
+### Modules opérationnels
+
+- **Administratif** : gestion des salles, emploi du temps par classe
+  (créneaux jour/heure/matière/enseignant/salle) avec détection des
+  chevauchements (même enseignant ou même salle)
+- **Élèves (compléments)** : photo de profil (upload), carte d'élève
+  générée en PDF, passage au statut diplômé/transféré
+- **Enseignants / Staff** : présence du personnel enseignant, historique
+  des contrats (temps plein/partiel/CDD, sans calcul de paie),
+  évaluations
+- **Académique** : programmes (syllabus) par matière/classe/année,
+  plans de cours par enseignant, devoirs avec soumission par l'élève et
+  correction par l'enseignant
+- **Communication** : messagerie directe entre utilisateurs (règles
+  d'accès spécifiques au parent multi-écoles), annonces ciblées par
+  rôle et/ou classe, demandes de rendez-vous parent-enseignant
+  (confirmation/annulation/clôture)
+- **Finance (frais de scolarité)** : barèmes de frais, facturation
+  individuelle ou par classe entière, paiements partiels ou complets
+  (espèces/mobile money) avec statut de facture dérivé automatiquement
+  (en attente/partiellement payée/payée/en retard/annulée) — **distinct**
+  de la facturation SaaS plateforme (abonnement école → plateforme)
+- **Rapports** : exports CSV (présences, finances, présences du
+  personnel), export PDF du bulletin, résumé agrégé pour le tableau de
+  bord administrateur (effectifs, taux de présence, factures impayées,
+  dépenses du mois)
+
 ## Roadmap — prochaines phases
 
 Le prompt d'origine couvrait un ERP scolaire complet (12 modules, apps
-web + mobile). Cette Phase 1 livre les fondations (auth, élèves,
-enseignants, présences, notes) et la Phase 1.5 la gouvernance SaaS
-multi-écoles. Prochaines étapes suggérées :
+web + mobile). Les Phases 1 et 1.5 livrent les fondations et la
+gouvernance SaaS multi-écoles ; les modules opérationnels ci-dessus
+complètent la gestion quotidienne d'une école. Prochaines étapes
+suggérées :
 
-- **Phase 2** : finances (frais, factures, paiements des familles —
-  distinct de la facturation SaaS), communication (messagerie,
-  annonces), bibliothèque
-- **Phase 3** : transport, rapports/analytics avancés (export PDF/Excel),
+- **Phase 2** : bibliothèque
+- **Phase 3** : transport, analytics avancés (tableaux de bord BI),
   application mobile (React Native), intégration paiement en ligne (Stripe)
 
-Hors scope, noté pour plus tard (voir `docs/delegation/00-OVERVIEW.md`) :
+Hors scope, noté pour plus tard (voir `docs/delegation/00-OVERVIEW.md` et
+`docs/delegation/09-OVERVIEW-OPS.md`) :
 
 - Application effective des quotas de plan (`maxStudents`/`maxTeachers`/
   `maxClasses`)
@@ -166,6 +194,13 @@ Hors scope, noté pour plus tard (voir `docs/delegation/00-OVERVIEW.md`) :
 - Routage par sous-domaine dédié à chaque école
 - Durcissement de l'isolation multi-tenant via une Prisma Client
   Extension (au-delà du scoping applicatif actuel par `schoolId`)
+- Paie réelle (calcul de charges sociales, bulletins de salaire) — les
+  contrats enregistrent uniquement les termes (salaire, type, dates)
+- Export Excel natif (`.xlsx`) — les rapports tabulaires sont en CSV
+- Pièces jointes de fichiers réels (devoirs, messages) — texte/URL
+  uniquement en v1, pas d'intégration S3/Cloudinary
+- Notifications push/email/SMS pour messages et annonces — in-app
+  uniquement (lecture au prochain login)
 
 ## Sécurité
 
@@ -178,3 +213,9 @@ Hors scope, noté pour plus tard (voir `docs/delegation/00-OVERVIEW.md`) :
 - Journal d'audit basique (`AuditLog`) sur les connexions
 - Rate-limiting sur l'inscription self-service publique (`/platform/schools/signup`)
   pour limiter les abus (`@nestjs/throttler`)
+- Upload de photo de profil validé côté serveur (type MIME JPEG/PNG
+  uniquement, taille maximale 2 Mo) avant écriture sur disque
+- Messagerie directe avec contrôle d'accès cross-école : un ADMIN/TEACHER
+  ne peut écrire qu'aux utilisateurs de sa propre école ; un PARENT peut
+  écrire aux enseignants de n'importe laquelle des écoles de ses enfants,
+  jamais à un utilisateur sans lien réel avec lui
