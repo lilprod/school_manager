@@ -108,6 +108,7 @@ model School {
 
   rooms         Room[]
   terms         Term[]
+  examSessions  ExamSession[]
   announcements Announcement[]
   feeStructures FeeStructure[]
   expenses      Expense[]
@@ -132,16 +133,20 @@ model AcademicYear {
   syllabi        Syllabus[]
   assignments    Assignment[]
   feeStructures  FeeStructure[]
+  examSessions   ExamSession[]
+  reportComments ReportComment[]
 
   @@unique([schoolId, label])
 }
 
 model ClassGroup {
-  id       String @id @default(cuid())
-  schoolId String
-  school   School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  name     String
-  level    String
+  classCoefficients ClassSubjectCoefficient[]
+  examSlots         ExamSlot[]
+  id                String                    @id @default(cuid())
+  schoolId          String
+  school            School                    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  name              String
+  level             String
 
   enrollments        Enrollment[]
   teacherAssignments TeacherAssignment[]
@@ -159,12 +164,15 @@ model ClassGroup {
 }
 
 model Subject {
-  id          String @id @default(cuid())
-  schoolId    String
-  school      School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  name        String
-  code        String
-  coefficient Float  @default(1)
+  classCoefficients ClassSubjectCoefficient[]
+  examSlots         ExamSlot[]
+  reportComments    ReportComment[]
+  id                String                    @id @default(cuid())
+  schoolId          String
+  school            School                    @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  name              String
+  code              String
+  coefficient       Float                     @default(1)
 
   teacherAssignments TeacherAssignment[]
   attendances        Attendance[]
@@ -179,20 +187,21 @@ model Subject {
 }
 
 model User {
-  id           String   @id @default(cuid())
-  schoolId     String?
-  school       School?  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  email        String   @unique
-  passwordHash String
-  role         Role
-  firstName    String
-  lastName     String
-  phone        String?
-  photoUrl     String?
-  isActive     Boolean  @default(true)
-  locale       String   @default("fr")
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  reportCommentsAuthored ReportComment[]
+  id                     String          @id @default(cuid())
+  schoolId               String?
+  school                 School?         @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  email                  String          @unique
+  passwordHash           String
+  role                   Role
+  firstName              String
+  lastName               String
+  phone                  String?
+  photoUrl               String?
+  isActive               Boolean         @default(true)
+  locale                 String          @default("fr")
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @updatedAt
 
   studentProfile StudentProfile?
   teacherProfile TeacherProfile?
@@ -223,12 +232,13 @@ model RefreshToken {
 }
 
 model StudentProfile {
-  id            String    @id @default(cuid())
-  userId        String    @unique
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  studentNumber String    @unique
-  dateOfBirth   DateTime?
-  gender        String?
+  reportComments ReportComment[]
+  id             String          @id @default(cuid())
+  userId         String          @unique
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  studentNumber  String          @unique
+  dateOfBirth    DateTime?
+  gender         String?
 
   enrollments Enrollment[]
   attendances Attendance[]
@@ -241,11 +251,12 @@ model StudentProfile {
 }
 
 model TeacherProfile {
-  id             String  @id @default(cuid())
-  userId         String  @unique
-  user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  employeeNumber String  @unique
-  qualifications String?
+  examSlotsSupervised ExamSlot[]
+  id                  String     @id @default(cuid())
+  userId              String     @unique
+  user                User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  employeeNumber      String     @unique
+  qualifications      String?
 
   assignments TeacherAssignment[]
 
@@ -356,7 +367,10 @@ model Term {
   endDate        DateTime
   createdAt      DateTime     @default(now())
 
-  assessments Assessment[]
+  assessments    Assessment[]
+  assignments    Assignment[]
+  examSessions   ExamSession[]
+  reportComments ReportComment[]
 
   @@unique([academicYearId, name])
 }
@@ -375,12 +389,13 @@ model Grade {
 }
 
 model Room {
-  id       String  @id @default(cuid())
-  schoolId String
-  school   School  @relation(fields: [schoolId], references: [id], onDelete: Cascade)
-  name     String
-  capacity Int?
-  type     String?
+  examSlots ExamSlot[]
+  id        String     @id @default(cuid())
+  schoolId  String
+  school    School     @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  name      String
+  capacity  Int?
+  type      String?
 
   timetableSlots TimetableSlot[]
 
@@ -485,6 +500,10 @@ model Assignment {
   academicYear   AcademicYear   @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
   dueDate        DateTime
   maxScore       Float          @default(20)
+  coefficient    Float          @default(1)
+  countsInReport Boolean        @default(false)
+  termId         String?
+  term           Term?          @relation(fields: [termId], references: [id], onDelete: SetNull)
   createdById    String
   createdBy      TeacherProfile @relation(fields: [createdById], references: [id], onDelete: Cascade)
   createdAt      DateTime       @default(now())
@@ -677,4 +696,72 @@ model AuditLog {
   createdAt DateTime @default(now())
 
   @@index([entity, entityId])
+}
+
+model ClassSubjectCoefficient {
+  id           String     @id @default(cuid())
+  classGroupId String
+  classGroup   ClassGroup @relation(fields: [classGroupId], references: [id], onDelete: Cascade)
+  subjectId    String
+  subject      Subject    @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  coefficient  Float
+
+  @@unique([classGroupId, subjectId])
+}
+
+model ExamSession {
+  id             String       @id @default(cuid())
+  schoolId       String
+  school         School       @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  academicYearId String
+  academicYear   AcademicYear @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  termId         String?
+  term           Term?        @relation(fields: [termId], references: [id], onDelete: SetNull)
+  name           String
+  startDate      DateTime
+  endDate        DateTime
+  createdAt      DateTime     @default(now())
+
+  slots ExamSlot[]
+
+  @@index([schoolId, startDate])
+}
+
+model ExamSlot {
+  id           String          @id @default(cuid())
+  sessionId    String
+  session      ExamSession     @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  classGroupId String
+  classGroup   ClassGroup      @relation(fields: [classGroupId], references: [id], onDelete: Cascade)
+  subjectId    String
+  subject      Subject         @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  roomId       String?
+  room         Room?           @relation(fields: [roomId], references: [id], onDelete: SetNull)
+  supervisorId String?
+  supervisor   TeacherProfile? @relation(fields: [supervisorId], references: [id], onDelete: SetNull)
+  date         DateTime
+  startTime    String
+  endTime      String
+  createdAt    DateTime        @default(now())
+
+  @@index([sessionId, date])
+  @@index([classGroupId, date])
+}
+
+model ReportComment {
+  id             String         @id @default(cuid())
+  studentId      String
+  student        StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  academicYearId String
+  academicYear   AcademicYear   @relation(fields: [academicYearId], references: [id], onDelete: Cascade)
+  termId         String?
+  term           Term?          @relation(fields: [termId], references: [id], onDelete: Cascade)
+  subjectId      String?
+  subject        Subject?       @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+  authorId       String
+  author         User           @relation(fields: [authorId], references: [id])
+  comment        String
+  updatedAt      DateTime       @updatedAt
+
+  @@index([studentId, academicYearId])
 }

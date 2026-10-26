@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { createSubject, fetchSubjects } from '../api/academic'
 import { Card } from '../components/Card'
+import { ClassCoefficientsSection } from '../components/ClassCoefficientsSection'
 
 interface FormValues {
   name: string
@@ -99,6 +100,8 @@ export default function SubjectsPage() {
           </tbody>
         </table>
       </Card>
+
+      <ClassCoefficientsSection />
     </div>
   )
 }

@@ -180,10 +180,18 @@ export interface ReportCardSubject {
   assessmentCount: number
 }
 
+export type Mention = 'CONGRATULATIONS' | 'ENCOURAGEMENTS' | 'HONOR_ROLL' | 'WARNING'
+
 export interface ReportCard {
   studentId: string
   academicYearId: string
   termId: string | null
+  rank: number | null
+  classSize: number
+  classAverage: number | null
+  mention: Mention | null
+  generalComment: string | null
+  subjectComments: Record<string, string>
   subjects: ReportCardSubject[]
   overallAverage: number
 }
@@ -297,6 +305,10 @@ export interface Assignment {
   academicYearId: string
   dueDate: string
   maxScore: number
+  coefficient: number
+  countsInReport: boolean
+  termId?: string | null
+  term?: Term | null
   createdById: string
 }
 
@@ -419,4 +431,47 @@ export interface StudentTeacher {
   firstName: string
   lastName: string
   subjects: string[]
+}
+
+// --- Calendrier d'examens ---
+
+export interface ExamSession {
+  id: string
+  academicYearId: string
+  termId?: string | null
+  term?: Term | null
+  name: string
+  startDate: string
+  endDate: string
+}
+
+export interface ExamSlot {
+  id: string
+  sessionId: string
+  session?: ExamSession
+  classGroupId: string
+  classGroup?: ClassGroup
+  subjectId: string
+  subject?: Subject
+  roomId?: string | null
+  room?: Room | null
+  supervisorId?: string | null
+  supervisor?: { id: string; user: { firstName: string; lastName: string } } | null
+  date: string
+  startTime: string
+  endTime: string
+}
+
+export interface ClassCoefficientRow {
+  subjectId: string
+  subjectName: string
+  defaultCoefficient: number
+  overrideId: string | null
+  coefficient: number
+}
+
+export interface ReportCommentEntry {
+  id: string
+  studentId: string
+  comment: string
 }

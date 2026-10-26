@@ -61,7 +61,14 @@ export function ReportCardSection({ studentId, academicYearId }: Props) {
             <tbody>
               {reportCard.data.subjects.map((s) => (
                 <tr key={s.subjectId} className="border-t border-slate-100 dark:border-slate-800">
-                  <td className="py-2 text-slate-900 dark:text-white">{s.subjectName}</td>
+                  <td className="py-2 text-slate-900 dark:text-white">
+                    {s.subjectName}
+                    {reportCard.data.subjectComments[s.subjectId] && (
+                      <span className="block text-xs italic text-slate-500 dark:text-slate-400">
+                        {reportCard.data.subjectComments[s.subjectId]}
+                      </span>
+                    )}
+                  </td>
                   <td className="py-2 text-slate-700 dark:text-slate-300">{s.coefficient}</td>
                   <td className="py-2 text-slate-700 dark:text-slate-300">{s.average}/20</td>
                 </tr>
@@ -71,6 +78,23 @@ export function ReportCardSection({ studentId, academicYearId }: Props) {
           <p className="mt-3 text-sm font-semibold text-slate-900 dark:text-white">
             {t('dashboard.overallAverage')} : {reportCard.data.overallAverage}/20
           </p>
+          {reportCard.data.rank !== null && (
+            <p className="mt-1 text-sm text-slate-700 dark:text-slate-300">
+              {t('grades.rank')} : {reportCard.data.rank}/{reportCard.data.classSize} — {t('grades.classAverage')} :{' '}
+              {reportCard.data.classAverage}/20
+            </p>
+          )}
+          {reportCard.data.mention && (
+            <p className="mt-1 text-sm font-medium text-indigo-700 dark:text-indigo-300">
+              {t(`grades.mention.${reportCard.data.mention}`)}
+            </p>
+          )}
+          {reportCard.data.generalComment && (
+            <p className="mt-3 rounded-lg bg-slate-50 p-3 text-sm text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+              <span className="font-medium">{t('grades.generalComment')} : </span>
+              {reportCard.data.generalComment}
+            </p>
+          )}
         </>
       ) : (
         <p className="text-sm text-slate-500 dark:text-slate-400">{t('common.noData')}</p>

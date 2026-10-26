@@ -74,3 +74,51 @@ export function computeReportCard(grades: GradeInput[]): ReportCardResult {
     overallAverage: overallWeights > 0 ? round(overallWeighted / overallWeights) : 0,
   };
 }
+
+export type Mention = 'CONGRATULATIONS' | 'ENCOURAGEMENTS' | 'HONOR_ROLL' | 'WARNING';
+
+export const MENTION_LABELS_FR: Record<Mention, string> = {
+  CONGRATULATIONS: 'Félicitations',
+  ENCOURAGEMENTS: 'Encouragements',
+  HONOR_ROLL: "Tableau d'honneur",
+  WARNING: 'Avertissement travail',
+};
+
+/** Mention automatique selon la moyenne générale (sur 20). */
+export function mentionFor(average: number): Mention | null {
+  if (average >= 16) return 'CONGRATULATIONS';
+  if (average >= 14) return 'ENCOURAGEMENTS';
+  if (average >= 12) return 'HONOR_ROLL';
+  if (average < 8) return 'WARNING';
+  return null;
+}
+
+export interface ClassStanding {
+  rank: number | null;
+  classSize: number;
+  classAverage: number | null;
+}
+
+/**
+ * Rang dans la classe : 1 + nombre d'élèves ayant une moyenne strictement
+ * supérieure (les ex æquo partagent le même rang). Seuls les élèves ayant au
+ * moins une note comptent dans l'effectif classé.
+ */
+export function computeStanding(studentId: string, averages: Map<string, number>): ClassStanding {
+  const classSize = averages.size;
+  const own = averages.get(studentId);
+  if (own === undefined) {
+    return { rank: null, classSize, classAverage: classSize > 0 ? classAverage(averages) : null };
+  }
+  let better = 0;
+  for (const value of averages.values()) {
+    if (value > own) better += 1;
+  }
+  return { rank: better + 1, classSize, classAverage: classAverage(averages) };
+}
+
+function classAverage(averages: Map<string, number>): number {
+  let sum = 0;
+  for (const value of averages.values()) sum += value;
+  return round(sum / averages.size);
+}

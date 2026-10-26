@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import PDFDocument from 'pdfkit';
 import { AttendanceService } from '../attendance/attendance.service.js';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.js';
+import { MENTION_LABELS_FR } from '../grading/report-card.js';
 import { StudentAccessService, type Requester } from '../common/access/student-access.service.js';
 import { GradingService } from '../grading/grading.service.js';
 import { InvoicesService } from '../invoices/invoices.service.js';
@@ -139,10 +140,31 @@ export class ReportsService {
       for (const subject of reportCard.subjects) {
         doc.text(`${subject.subjectName} (${subject.coefficient})`, 40, doc.y, { continued: true, width: 300 });
         doc.text(String(subject.average), { align: 'right' });
+        const subjectComment = reportCard.subjectComments[subject.subjectId];
+        if (subjectComment) {
+          doc.fontSize(9).fillColor('#555555').text(subjectComment, 50, doc.y, { width: 480 });
+          doc.fontSize(11).fillColor('black');
+        }
       }
 
       doc.moveDown(1.5);
       doc.fontSize(13).font('Helvetica-Bold').text(`Moyenne générale : ${reportCard.overallAverage} / 20`);
+      if (reportCard.rank !== null) {
+        doc
+          .fontSize(11)
+          .font('Helvetica')
+          .text(
+            `Rang : ${reportCard.rank} / ${reportCard.classSize}  —  Moyenne de la classe : ${reportCard.classAverage} / 20`,
+          );
+      }
+      if (reportCard.mention) {
+        doc.font('Helvetica-Bold').text(`Mention : ${MENTION_LABELS_FR[reportCard.mention]}`);
+      }
+      if (reportCard.generalComment) {
+        doc.moveDown(1);
+        doc.font('Helvetica-Bold').text('Appréciation générale');
+        doc.font('Helvetica').text(reportCard.generalComment);
+      }
 
       doc.end();
     });

@@ -133,6 +133,18 @@ pour illustrer le support des parents multi-écoles.
   d'une matière pondère ses évaluations, la moyenne générale pondère les
   matières. Bulletin (écran et PDF) filtrable par trimestre ou sur
   l'année complète
+- **Coefficients par classe** : un coefficient propre à une classe
+  remplace celui de la matière pour les bulletins de cette classe
+- **Bulletin enrichi** : notes de devoirs corrigés intégrées au bulletin
+  (option par devoir, avec coefficient et trimestre), rang dans la classe
+  (ex æquo gérés) et moyenne de classe, mention automatique
+  (félicitations, encouragements, tableau d'honneur, avertissement),
+  appréciations générale (administrateur) et par matière (enseignant de
+  la matière) affichées à l'écran et dans le PDF
+- **Calendrier d'examens** : sessions d'examen (rattachables à un
+  trimestre) et créneaux par classe/matière/salle/surveillant avec
+  détection des conflits (classe, salle, surveillant) ; consultation par
+  l'élève et ses parents
 - **Interface** : tableaux de bord par rôle, FR/EN, mode sombre, design
   responsive
 
@@ -189,9 +201,6 @@ gouvernance SaaS multi-écoles ; les modules opérationnels ci-dessus
 complètent la gestion quotidienne d'une école. Prochaines étapes
 suggérées :
 
-- **Évaluation (à compléter)** : calendrier d'examens (sessions, salles,
-  surveillants), coefficients propres à une classe, classement et
-  appréciations sur le bulletin, notes de devoirs intégrées au bulletin
 - **Phase 2** : bibliothèque
 - **Phase 3** : transport, analytics avancés (tableaux de bord BI),
   application mobile (React Native), intégration paiement en ligne (Stripe)
@@ -215,7 +224,9 @@ Hors scope, noté pour plus tard (voir `docs/delegation/00-OVERVIEW.md` et
 
 ## Sécurité
 
-- Mots de passe hachés (bcrypt), jamais retournés par l'API
+- Mots de passe hachés (bcrypt), jamais retournés par l'API : un
+  intercepteur global retire `passwordHash`/`tokenHash` de toute réponse,
+  même imbriquée dans une relation
 - Refresh tokens hachés en base (SHA-256) et révocables
 - Validation stricte des entrées (class-validator, `whitelist` +
   `forbidNonWhitelisted`)

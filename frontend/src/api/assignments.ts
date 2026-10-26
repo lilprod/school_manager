@@ -9,6 +9,9 @@ export interface CreateAssignmentPayload {
   academicYearId: string
   dueDate: string
   maxScore?: number
+  coefficient?: number
+  countsInReport?: boolean
+  termId?: string
 }
 
 export interface GradeSubmissionPayload {
@@ -71,6 +74,9 @@ export interface UpdateAssignmentPayload {
   description?: string
   dueDate?: string
   maxScore?: number
+  coefficient?: number
+  countsInReport?: boolean
+  termId?: string
 }
 
 export async function updateAssignment(id: string, payload: UpdateAssignmentPayload): Promise<Assignment> {

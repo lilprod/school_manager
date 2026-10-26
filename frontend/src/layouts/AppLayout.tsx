@@ -35,8 +35,20 @@ const NAV_ITEMS: NavItem[] = [
     group: 'nav.groupStaff',
   },
 
+  {
+    to: '/report-comments',
+    labelKey: 'nav.reportComments',
+    roles: ['ADMIN', 'TEACHER'],
+    group: 'nav.groupAcademic',
+  },
   { to: '/syllabi', labelKey: 'nav.syllabi', roles: ['ADMIN', 'TEACHER'], group: 'nav.groupAcademic' },
   { to: '/lesson-plans', labelKey: 'nav.lessonPlans', roles: ['ADMIN', 'TEACHER'], group: 'nav.groupAcademic' },
+  {
+    to: '/exams',
+    labelKey: 'nav.exams',
+    roles: ['ADMIN', 'TEACHER', 'STUDENT', 'PARENT'],
+    group: 'nav.groupAcademic',
+  },
   {
     to: '/assignments',
     labelKey: 'nav.assignments',

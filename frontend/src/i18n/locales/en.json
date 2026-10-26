@@ -14,7 +14,8 @@
     "back": "Back",
     "logout": "Log out",
     "error": "Something went wrong",
-    "noData": "No data"
+    "noData": "No data",
+    "yes": "Yes"
   },
   "auth": {
     "login": "Sign in",
@@ -42,6 +43,7 @@
     "syllabi": "Syllabi",
     "lessonPlans": "Lesson plans",
     "assignments": "Assignments",
+    "exams": "Exam schedule",
     "messages": "Messages",
     "announcements": "Announcements",
     "meetings": "Meetings",
@@ -54,7 +56,8 @@
     "groupAcademic": "Academic",
     "groupCommunication": "Communication",
     "groupFinance": "Finance",
-    "terms": "Terms"
+    "terms": "Terms",
+    "reportComments": "Report comments"
   },
   "roles": {
     "SUPER_ADMIN": "Super admin",
@@ -221,7 +224,9 @@
     "submittedAt": "Submitted",
     "feedback": "Feedback",
     "maxScore": "Maximum score",
-    "late": "Late"
+    "late": "Late",
+    "countsInReport": "Count in report card",
+    "inReport": "Report card"
   },
   "messages": {
     "title": "Messages",
@@ -328,7 +333,30 @@
     "average": "Average",
     "reportCard": "Report card",
     "coefficient": "Coef.",
-    "downloadPdf": "Download PDF"
+    "downloadPdf": "Download PDF",
+    "rank": "Rank",
+    "classAverage": "Class average",
+    "generalComment": "General comment",
+    "mention": {
+      "CONGRATULATIONS": "Congratulations",
+      "ENCOURAGEMENTS": "Encouragements",
+      "HONOR_ROLL": "Honor roll",
+      "WARNING": "Work warning"
+    }
+  },
+  "exams": {
+    "title": "Exam schedule",
+    "createSession": "New session",
+    "deleteSession": "Delete session",
+    "sessionName": "Session name",
+    "createSlot": "Add exam slot",
+    "noSessions": "No exam sessions",
+    "noSlots": "No exams scheduled",
+    "allClasses": "All classes",
+    "date": "Date",
+    "time": "Time",
+    "room": "Room",
+    "supervisor": "Supervisor"
   },
   "language": {
     "fr": "Français",
@@ -346,6 +374,16 @@
     "wholeYear": "Whole year"
   },
   "subjects": {
-    "coefficient": "Coefficient"
+    "coefficient": "Coefficient",
+    "classCoefficients": "Class coefficients",
+    "classCoefficientsHint": "A class-specific coefficient replaces the subject coefficient when computing this class report cards.",
+    "defaultCoefficient": "Default",
+    "overridden": "Custom",
+    "resetDefault": "Reset"
+  },
+  "reportComments": {
+    "title": "Report card comments",
+    "general": "General comment",
+    "comment": "Comment"
   }
 }

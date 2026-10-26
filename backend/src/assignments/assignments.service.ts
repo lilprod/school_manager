@@ -13,6 +13,7 @@ import type { SubmitAssignmentDto } from './dto/submit-assignment.dto.js';
 import type { UpdateAssignmentDto } from './dto/update-assignment.dto.js';
 
 const assignmentInclude = {
+  term: true,
   subject: true,
   classGroup: true,
   academicYear: true,
@@ -36,6 +37,9 @@ export class AssignmentsService {
   async create(schoolId: string, userId: string, dto: CreateAssignmentDto) {
     const teacherId = await this.resolveTeacherId(schoolId, userId);
     await this.assertClassGroupInSchool(schoolId, dto.classGroupId);
+    if (dto.termId) {
+      await this.assertTermInYear(schoolId, dto.termId, dto.academicYearId);
+    }
 
     return this.prisma.assignment.create({
       data: {
@@ -46,6 +50,9 @@ export class AssignmentsService {
         academicYearId: dto.academicYearId,
         dueDate: new Date(dto.dueDate),
         maxScore: dto.maxScore ?? 20,
+        coefficient: dto.coefficient ?? 1,
+        countsInReport: dto.countsInReport ?? false,
+        termId: dto.termId,
         createdById: teacherId,
       },
       include: assignmentInclude,
@@ -83,6 +90,10 @@ export class AssignmentsService {
       throw new ForbiddenException('Vous ne pouvez modifier que vos propres devoirs.');
     }
 
+    if (dto.termId) {
+      await this.assertTermInYear(schoolId, dto.termId, assignment.academicYearId);
+    }
+
     if (dto.maxScore !== undefined) {
       const above = await this.prisma.assignmentSubmission.findFirst({
         where: { assignmentId: id, grade: { gt: dto.maxScore } },
@@ -98,6 +109,9 @@ export class AssignmentsService {
         title: dto.title,
         description: dto.description,
         maxScore: dto.maxScore,
+        coefficient: dto.coefficient,
+        countsInReport: dto.countsInReport,
+        termId: dto.termId,
         dueDate: dto.dueDate ? new Date(dto.dueDate) : undefined,
       },
       include: assignmentInclude,
@@ -227,6 +241,13 @@ export class AssignmentsService {
       where: { assignmentId_studentId: { assignmentId, studentId } },
       include: submissionInclude,
     });
+  }
+
+  private async assertTermInYear(schoolId: string, termId: string, academicYearId: string) {
+    const term = await this.prisma.term.findFirst({ where: { id: termId, schoolId, academicYearId } });
+    if (!term) {
+      throw new NotFoundException('Trimestre introuvable pour cette année académique.');
+    }
   }
 
   private async assertClassGroupInSchool(schoolId: string, classGroupId: string) {

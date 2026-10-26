@@ -305,6 +305,45 @@ async function main() {
     { subject: subjectFrench, classGroup: classB, title: 'Dictée et grammaire', term: terms[1], coefficient: 1 },
   ];
 
+  // Coefficient propre à une classe : en 5ème B, le français pèse plus lourd.
+  await prisma.classSubjectCoefficient.create({
+    data: { classGroupId: classB.id, subjectId: subjectFrench.id, coefficient: 4 },
+  });
+
+  // Calendrier d'examens du 1er trimestre.
+  const examSession = await prisma.examSession.create({
+    data: {
+      schoolId: school.id,
+      academicYearId: academicYear.id,
+      termId: terms[0].id,
+      name: 'Examens du 1er trimestre',
+      startDate: new Date('2025-12-08'),
+      endDate: new Date('2025-12-12'),
+    },
+  });
+  await prisma.examSlot.createMany({
+    data: [
+      {
+        sessionId: examSession.id,
+        classGroupId: classA.id,
+        subjectId: subjectMath.id,
+        supervisorId: teacherFrench.id,
+        date: new Date('2025-12-08'),
+        startTime: '08:00',
+        endTime: '10:00',
+      },
+      {
+        sessionId: examSession.id,
+        classGroupId: classA.id,
+        subjectId: subjectFrench.id,
+        supervisorId: teacherMath.id,
+        date: new Date('2025-12-09'),
+        startTime: '08:00',
+        endTime: '10:00',
+      },
+    ],
+  });
+
   for (const config of assessmentConfigs) {
     const assessment = await prisma.assessment.create({
       data: {

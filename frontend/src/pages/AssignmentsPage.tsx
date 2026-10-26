@@ -14,6 +14,7 @@ import {
   type CreateAssignmentPayload,
   type UpdateAssignmentPayload,
 } from '../api/assignments'
+import { fetchTerms } from '../api/terms'
 import { Card } from '../components/Card'
 import { useAuthStore } from '../stores/auth-store'
 
@@ -33,6 +34,12 @@ export default function AssignmentsPage() {
   const subjects = useQuery({ queryKey: ['subjects'], queryFn: fetchSubjects })
   const years = useQuery({ queryKey: ['academic-years'], queryFn: fetchAcademicYears })
   const currentYear = years.data?.find((y) => y.isCurrent) ?? years.data?.[0]
+
+  const terms = useQuery({
+    queryKey: ['terms', currentYear?.id],
+    queryFn: () => fetchTerms(currentYear!.id),
+    enabled: !!currentYear,
+  })
 
   const assignments = useQuery({
     queryKey: ['assignments', classGroupId],
@@ -106,6 +113,8 @@ export default function AssignmentsPage() {
                 ...values,
                 academicYearId: currentYear?.id ?? values.academicYearId,
                 maxScore: Number.isFinite(values.maxScore) ? values.maxScore : undefined,
+                coefficient: Number.isFinite(values.coefficient) ? values.coefficient : undefined,
+                termId: values.termId || undefined,
               }),
             )}
             className="grid grid-cols-1 gap-3 sm:grid-cols-3"
@@ -150,6 +159,29 @@ export default function AssignmentsPage() {
               className="rounded-lg border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-white"
               {...register('maxScore', { valueAsNumber: true })}
             />
+            <select
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+              {...register('termId')}
+            >
+              <option value="">{t('terms.noTerm')}</option>
+              {terms.data?.map((term) => (
+                <option key={term.id} value={term.id}>
+                  {term.name}
+                </option>
+              ))}
+            </select>
+            <input
+              type="number"
+              min={0.5}
+              step={0.5}
+              placeholder={t('grades.coefficient') as string}
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+              {...register('coefficient', { valueAsNumber: true })}
+            />
+            <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+              <input type="checkbox" {...register('countsInReport')} />
+              {t('assignments.countsInReport')}
+            </label>
             <input
               placeholder={t('assignments.description') as string}
               className="rounded-lg border border-slate-300 px-3 py-2 text-sm sm:col-span-2 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
@@ -190,6 +222,7 @@ export default function AssignmentsPage() {
               <th className="pb-2">{t('students.class')}</th>
               <th className="pb-2">{t('assignments.dueDate')}</th>
               <th className="pb-2">{t('assignments.maxScore')}</th>
+              <th className="pb-2">{t('assignments.inReport')}</th>
               <th className="pb-2">{t('common.actions')}</th>
             </tr>
           </thead>
@@ -201,6 +234,9 @@ export default function AssignmentsPage() {
                 <td className="py-2 text-slate-700 dark:text-slate-300">{a.classGroup?.name}</td>
                 <td className="py-2 text-slate-700 dark:text-slate-300">{a.dueDate.slice(0, 10)}</td>
                 <td className="py-2 text-slate-700 dark:text-slate-300">{a.maxScore}</td>
+                <td className="py-2 text-slate-700 dark:text-slate-300">
+                  {a.countsInReport ? `${t('common.yes')} (×${a.coefficient}${a.term ? `, ${a.term.name}` : ''})` : '—'}
+                </td>
                 <td className="py-2 space-x-3">
                   {isTeacher && (
                     <button

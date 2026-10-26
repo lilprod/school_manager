@@ -4,7 +4,12 @@ import { PrismaService } from '../prisma/prisma.service.js';
 import type { BulkEnterGradesDto } from './dto/bulk-enter-grades.dto.js';
 import type { CreateAssessmentDto } from './dto/create-assessment.dto.js';
 import type { UpdateAssessmentDto } from './dto/update-assessment.dto.js';
-import { computeReportCard } from './report-card.js';
+import {
+  computeReportCard,
+  computeStanding,
+  mentionFor,
+  type GradeInput,
+} from './report-card.js';
 
 const assessmentInclude = { subject: true, classGroup: true, academicYear: true, term: true };
 
@@ -133,23 +138,125 @@ export class GradingService {
   ) {
     await this.studentAccess.assertCanView(schoolId, requester, studentId);
 
-    const grades = await this.prisma.grade.findMany({
-      where: { studentId, assessment: { academicYearId, ...(termId ? { termId } : {}) } },
-      include: { assessment: { include: { subject: true } } },
+    const enrollment = await this.prisma.enrollment.findFirst({
+      where: { studentId, academicYearId },
+      orderBy: { createdAt: 'desc' },
     });
 
-    const result = computeReportCard(
-      grades.map((grade) => ({
+    // Élèves classés avec lui : même classe, même année (hors transferts sortants).
+    const classmateIds = enrollment
+      ? (
+          await this.prisma.enrollment.findMany({
+            where: {
+              classGroupId: enrollment.classGroupId,
+              academicYearId,
+              status: { not: 'transferred_out' },
+            },
+            select: { studentId: true },
+          })
+        ).map((e) => e.studentId)
+      : [];
+    const studentIds = Array.from(new Set([studentId, ...classmateIds]));
+
+    const overrides = enrollment
+      ? new Map(
+          (
+            await this.prisma.classSubjectCoefficient.findMany({
+              where: { classGroupId: enrollment.classGroupId },
+            })
+          ).map((c) => [c.subjectId, c.coefficient]),
+        )
+      : new Map<string, number>();
+
+    const inputsByStudent = await this.loadGradeInputs(studentIds, academicYearId, termId, overrides);
+
+    const own = computeReportCard(inputsByStudent.get(studentId) ?? []);
+
+    const averages = new Map<string, number>();
+    for (const id of studentIds) {
+      const inputs = inputsByStudent.get(id);
+      if (inputs && inputs.length > 0) {
+        averages.set(id, computeReportCard(inputs).overallAverage);
+      }
+    }
+    const standing = computeStanding(studentId, averages);
+
+    const hasGrades = (inputsByStudent.get(studentId) ?? []).length > 0;
+    const comments = await this.prisma.reportComment.findMany({
+      where: { studentId, academicYearId, termId: termId ?? null },
+    });
+
+    return {
+      studentId,
+      academicYearId,
+      termId: termId ?? null,
+      ...own,
+      rank: standing.rank,
+      classSize: standing.classSize,
+      classAverage: standing.classAverage,
+      mention: hasGrades ? mentionFor(own.overallAverage) : null,
+      generalComment: comments.find((c) => c.subjectId === null)?.comment ?? null,
+      subjectComments: Object.fromEntries(
+        comments.filter((c) => c.subjectId !== null).map((c) => [c.subjectId as string, c.comment]),
+      ),
+    };
+  }
+
+  /** Notes d'évaluations + devoirs corrigés comptés au bulletin, par élève. */
+  private async loadGradeInputs(
+    studentIds: string[],
+    academicYearId: string,
+    termId: string | undefined,
+    coefficientOverrides: Map<string, number>,
+  ): Promise<Map<string, GradeInput[]>> {
+    const [grades, submissions] = await Promise.all([
+      this.prisma.grade.findMany({
+        where: {
+          studentId: { in: studentIds },
+          assessment: { academicYearId, ...(termId ? { termId } : {}) },
+        },
+        include: { assessment: { include: { subject: true } } },
+      }),
+      this.prisma.assignmentSubmission.findMany({
+        where: {
+          studentId: { in: studentIds },
+          grade: { not: null },
+          assignment: { academicYearId, countsInReport: true, ...(termId ? { termId } : {}) },
+        },
+        include: { assignment: { include: { subject: true } } },
+      }),
+    ]);
+
+    const byStudent = new Map<string, GradeInput[]>();
+    const push = (studentId: string, input: GradeInput) => {
+      const list = byStudent.get(studentId) ?? [];
+      list.push(input);
+      byStudent.set(studentId, list);
+    };
+    const subjectCoefficient = (subject: { id: string; coefficient: number }) =>
+      coefficientOverrides.get(subject.id) ?? subject.coefficient;
+
+    for (const grade of grades) {
+      push(grade.studentId, {
         score: grade.score,
         maxScore: grade.assessment.maxScore,
         assessmentCoefficient: grade.assessment.coefficient,
         subjectId: grade.assessment.subjectId,
         subjectName: grade.assessment.subject.name,
-        subjectCoefficient: grade.assessment.subject.coefficient,
-      })),
-    );
-
-    return { studentId, academicYearId, termId: termId ?? null, ...result };
+        subjectCoefficient: subjectCoefficient(grade.assessment.subject),
+      });
+    }
+    for (const submission of submissions) {
+      push(submission.studentId, {
+        score: submission.grade as number,
+        maxScore: submission.assignment.maxScore,
+        assessmentCoefficient: submission.assignment.coefficient,
+        subjectId: submission.assignment.subjectId,
+        subjectName: submission.assignment.subject.name,
+        subjectCoefficient: subjectCoefficient(submission.assignment.subject),
+      });
+    }
+    return byStudent;
   }
 
   private async assertTermInYear(schoolId: string, termId: string, academicYearId: string) {

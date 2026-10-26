@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthModule } from './auth/auth.module.js';
 import { JwtAuthGuard } from './common/guards/jwt-auth.guard.js';
 import { RolesGuard } from './common/guards/roles.guard.js';
+import { StripSecretsInterceptor } from './common/interceptors/strip-secrets.interceptor.js';
 import { PrismaModule } from './prisma/prisma.module.js';
 import { UsersModule } from './users/users.module.js';
 import { SchoolsModule } from './schools/schools.module.js';
@@ -34,6 +35,9 @@ import { ExpensesModule } from './expenses/expenses.module.js';
 import { ReportsModule } from './reports/reports.module.js';
 import { TermsModule } from './terms/terms.module.js';
 import { ContactsModule } from './contacts/contacts.module.js';
+import { ClassCoefficientsModule } from './class-coefficients/class-coefficients.module.js';
+import { ReportCommentsModule } from './report-comments/report-comments.module.js';
+import { ExamsModule } from './exams/exams.module.js';
 
 @Module({
   imports: [
@@ -69,10 +73,14 @@ import { ContactsModule } from './contacts/contacts.module.js';
     ReportsModule,
     TermsModule,
     ContactsModule,
+    ClassCoefficientsModule,
+    ReportCommentsModule,
+    ExamsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
+    { provide: APP_INTERCEPTOR, useClass: StripSecretsInterceptor },
   ],
 })
 export class AppModule {}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { computeReportCard, type GradeInput } from './report-card.js';
+import { computeReportCard, computeStanding, mentionFor, type GradeInput } from './report-card.js';
 
 const grade = (overrides: Partial<GradeInput>): GradeInput => ({
   score: 10,
@@ -55,5 +55,45 @@ describe('computeReportCard', () => {
   it('arrondit à deux décimales', () => {
     const result = computeReportCard([grade({ score: 10 }), grade({ score: 10 }), grade({ score: 11 })]);
     expect(result.subjects[0].average).toBe(10.33);
+  });
+});
+
+describe('mentionFor', () => {
+  it.each([
+    [18, 'CONGRATULATIONS'],
+    [16, 'CONGRATULATIONS'],
+    [15.99, 'ENCOURAGEMENTS'],
+    [14, 'ENCOURAGEMENTS'],
+    [12, 'HONOR_ROLL'],
+    [10, null],
+    [7.99, 'WARNING'],
+  ])('moyenne %s -> %s', (average, expected) => {
+    expect(mentionFor(average)).toBe(expected);
+  });
+});
+
+describe('computeStanding', () => {
+  const averages = new Map([
+    ['a', 15],
+    ['b', 12],
+    ['c', 15],
+    ['d', 9],
+  ]);
+
+  it('donne le même rang aux ex æquo et saute le suivant', () => {
+    expect(computeStanding('a', averages).rank).toBe(1);
+    expect(computeStanding('c', averages).rank).toBe(1);
+    expect(computeStanding('b', averages).rank).toBe(3);
+    expect(computeStanding('d', averages).rank).toBe(4);
+  });
+
+  it('retourne l\'effectif et la moyenne de classe', () => {
+    const standing = computeStanding('b', averages);
+    expect(standing.classSize).toBe(4);
+    expect(standing.classAverage).toBe(12.75);
+  });
+
+  it('ne classe pas un élève sans note', () => {
+    expect(computeStanding('z', averages).rank).toBeNull();
   });
 });

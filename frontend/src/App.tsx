@@ -19,6 +19,7 @@ import PlatformPlansPage from './pages/platform/PlatformPlansPage'
 import PlatformSchoolDetailPage from './pages/platform/PlatformSchoolDetailPage'
 import PlatformSchoolsListPage from './pages/platform/PlatformSchoolsListPage'
 import ReportsPage from './pages/ReportsPage'
+import ReportCommentsPage from './pages/ReportCommentsPage'
 import RoomsPage from './pages/RoomsPage'
 import StaffAttendancePage from './pages/StaffAttendancePage'
 import StudentsPage from './pages/StudentsPage'
@@ -27,6 +28,7 @@ import SyllabiPage from './pages/SyllabiPage'
 import TeachersPage from './pages/TeachersPage'
 import TermsPage from './pages/TermsPage'
 import TimetablePage from './pages/TimetablePage'
+import ExamsPage from './pages/ExamsPage'
 import { ProtectedRoute } from './routes/ProtectedRoute'
 
 export default function App() {
@@ -132,6 +134,14 @@ export default function App() {
           }
         />
         <Route
+          path="/report-comments"
+          element={
+            <ProtectedRoute roles={['ADMIN', 'TEACHER']}>
+              <ReportCommentsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/rooms"
           element={
             <ProtectedRoute roles={['ADMIN', 'TEACHER']}>
@@ -144,6 +154,14 @@ export default function App() {
           element={
             <ProtectedRoute roles={['ADMIN', 'TEACHER', 'STUDENT']}>
               <TimetablePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/exams"
+          element={
+            <ProtectedRoute roles={['ADMIN', 'TEACHER', 'STUDENT', 'PARENT']}>
+              <ExamsPage />
             </ProtectedRoute>
           }
         />

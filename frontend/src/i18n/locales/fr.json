@@ -14,7 +14,8 @@
     "back": "Retour",
     "logout": "Déconnexion",
     "error": "Une erreur est survenue",
-    "noData": "Aucune donnée"
+    "noData": "Aucune donnée",
+    "yes": "Oui"
   },
   "auth": {
     "login": "Connexion",
@@ -42,6 +43,7 @@
     "syllabi": "Programmes",
     "lessonPlans": "Plans de cours",
     "assignments": "Devoirs",
+    "exams": "Calendrier d'examens",
     "messages": "Messages",
     "announcements": "Annonces",
     "meetings": "Rendez-vous",
@@ -54,7 +56,8 @@
     "groupAcademic": "Académique",
     "groupCommunication": "Communication",
     "groupFinance": "Finance",
-    "terms": "Trimestres"
+    "terms": "Trimestres",
+    "reportComments": "Appréciations"
   },
   "roles": {
     "SUPER_ADMIN": "Super-administrateur",
@@ -221,7 +224,9 @@
     "submittedAt": "Rendu le",
     "feedback": "Commentaire",
     "maxScore": "Note maximale",
-    "late": "En retard"
+    "late": "En retard",
+    "countsInReport": "Compter dans le bulletin",
+    "inReport": "Bulletin"
   },
   "messages": {
     "title": "Messages",
@@ -328,7 +333,30 @@
     "average": "Moyenne",
     "reportCard": "Bulletin",
     "coefficient": "Coef.",
-    "downloadPdf": "Télécharger le PDF"
+    "downloadPdf": "Télécharger le PDF",
+    "rank": "Rang",
+    "classAverage": "Moyenne de la classe",
+    "generalComment": "Appréciation générale",
+    "mention": {
+      "CONGRATULATIONS": "Félicitations",
+      "ENCOURAGEMENTS": "Encouragements",
+      "HONOR_ROLL": "Tableau d'honneur",
+      "WARNING": "Avertissement travail"
+    }
+  },
+  "exams": {
+    "title": "Calendrier d'examens",
+    "createSession": "Nouvelle session",
+    "deleteSession": "Supprimer la session",
+    "sessionName": "Nom de la session",
+    "createSlot": "Ajouter un créneau d'examen",
+    "noSessions": "Aucune session d'examen",
+    "noSlots": "Aucun examen planifié",
+    "allClasses": "Toutes les classes",
+    "date": "Date",
+    "time": "Horaire",
+    "room": "Salle",
+    "supervisor": "Surveillant"
   },
   "language": {
     "fr": "Français",
@@ -346,6 +374,16 @@
     "wholeYear": "Année complète"
   },
   "subjects": {
-    "coefficient": "Coefficient"
+    "coefficient": "Coefficient",
+    "classCoefficients": "Coefficients par classe",
+    "classCoefficientsHint": "Un coefficient propre à une classe remplace celui de la matière pour le calcul des bulletins de cette classe.",
+    "defaultCoefficient": "Par défaut",
+    "overridden": "Personnalisé",
+    "resetDefault": "Rétablir"
+  },
+  "reportComments": {
+    "title": "Appréciations du bulletin",
+    "general": "Appréciation générale",
+    "comment": "Appréciation"
   }
 }
