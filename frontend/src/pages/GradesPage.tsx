@@ -10,6 +10,7 @@ import {
   type CreateAssessmentPayload,
 } from '../api/grading'
 import { fetchStudents } from '../api/students'
+import { fetchTerms } from '../api/terms'
 import { Card } from '../components/Card'
 
 export default function GradesPage() {
@@ -24,6 +25,12 @@ export default function GradesPage() {
   const subjects = useQuery({ queryKey: ['subjects'], queryFn: fetchSubjects })
   const years = useQuery({ queryKey: ['academic-years'], queryFn: fetchAcademicYears })
   const currentYear = years.data?.find((y) => y.isCurrent) ?? years.data?.[0]
+
+  const terms = useQuery({
+    queryKey: ['terms', currentYear?.id],
+    queryFn: () => fetchTerms(currentYear!.id),
+    enabled: !!currentYear,
+  })
 
   const assessments = useQuery({
     queryKey: ['assessments', classGroupId],
@@ -78,7 +85,12 @@ export default function GradesPage() {
         <Card>
           <form
             onSubmit={handleSubmit((values) =>
-              createMutation.mutate({ ...values, academicYearId: currentYear?.id ?? values.academicYearId }),
+              createMutation.mutate({
+                ...values,
+                academicYearId: currentYear?.id ?? values.academicYearId,
+                termId: values.termId || undefined,
+                coefficient: Number.isFinite(values.coefficient) ? values.coefficient : undefined,
+              }),
             )}
             className="grid grid-cols-1 gap-3 sm:grid-cols-3"
           >
@@ -119,6 +131,25 @@ export default function GradesPage() {
                 </option>
               ))}
             </select>
+            <select
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+              {...register('termId')}
+            >
+              <option value="">{t('terms.noTerm')}</option>
+              {terms.data?.map((term) => (
+                <option key={term.id} value={term.id}>
+                  {term.name}
+                </option>
+              ))}
+            </select>
+            <input
+              type="number"
+              step="0.5"
+              min="0.5"
+              placeholder={t('grades.coefficient') as string}
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+              {...register('coefficient', { valueAsNumber: true })}
+            />
             <input
               type="date"
               className="rounded-lg border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-white"
@@ -156,6 +187,8 @@ export default function GradesPage() {
             <tr className="text-slate-500 dark:text-slate-400">
               <th className="pb-2">{t('grades.assessment')}</th>
               <th className="pb-2">{t('grades.subject')}</th>
+              <th className="pb-2">{t('terms.term')}</th>
+              <th className="pb-2">{t('grades.coefficient')}</th>
               <th className="pb-2">{t('attendance.date')}</th>
               <th className="pb-2">{t('common.actions')}</th>
             </tr>
@@ -165,6 +198,8 @@ export default function GradesPage() {
               <tr key={a.id} className="border-t border-slate-100 dark:border-slate-800">
                 <td className="py-2 text-slate-900 dark:text-white">{a.title}</td>
                 <td className="py-2 text-slate-700 dark:text-slate-300">{a.subject.name}</td>
+                <td className="py-2 text-slate-700 dark:text-slate-300">{a.term?.name ?? '—'}</td>
+                <td className="py-2 text-slate-700 dark:text-slate-300">{a.coefficient}</td>
                 <td className="py-2 text-slate-700 dark:text-slate-300">{a.date.slice(0, 10)}</td>
                 <td className="py-2">
                   <button

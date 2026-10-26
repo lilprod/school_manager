@@ -91,6 +91,15 @@ export interface Subject {
   id: string
   name: string
   code: string
+  coefficient: number
+}
+
+export interface Term {
+  id: string
+  academicYearId: string
+  name: string
+  startDate: string
+  endDate: string
 }
 
 export interface Enrollment {
@@ -147,6 +156,9 @@ export interface Assessment {
   title: string
   type: AssessmentType
   maxScore: number
+  coefficient: number
+  termId?: string | null
+  term?: Term | null
   date: string
   subject: Subject
   classGroup: ClassGroup
@@ -163,6 +175,7 @@ export interface Grade {
 export interface ReportCardSubject {
   subjectId: string
   subjectName: string
+  coefficient: number
   average: number
   assessmentCount: number
 }
@@ -170,6 +183,7 @@ export interface ReportCardSubject {
 export interface ReportCard {
   studentId: string
   academicYearId: string
+  termId: string | null
   subjects: ReportCardSubject[]
   overallAverage: number
 }
@@ -267,6 +281,7 @@ export interface AssignmentSubmission {
   student?: StudentProfile
   content?: string | null
   submittedAt: string
+  isLate?: boolean
   grade?: number | null
   feedback?: string | null
 }
@@ -281,6 +296,7 @@ export interface Assignment {
   classGroup?: ClassGroup
   academicYearId: string
   dueDate: string
+  maxScore: number
   createdById: string
 }
 
@@ -307,6 +323,7 @@ export interface Announcement {
   classGroupId?: string | null
   classGroup?: ClassGroup | null
   authorId: string
+  school?: { id: string; name: string }
   publishedAt: string
 }
 
@@ -382,4 +399,24 @@ export interface ReportsSummary {
   attendanceRatePercent: number
   outstandingInvoicesTotal: number
   totalExpensesThisMonth: number
+}
+
+// --- Annuaire ---
+
+export interface Contact {
+  id: string
+  firstName: string
+  lastName: string
+  role: Role
+  schoolId: string | null
+  schoolName: string | null
+  teacherProfileId: string | null
+}
+
+export interface StudentTeacher {
+  teacherId: string
+  userId: string
+  firstName: string
+  lastName: string
+  subjects: string[]
 }

@@ -8,6 +8,7 @@ export interface CreateAssignmentPayload {
   classGroupId: string
   academicYearId: string
   dueDate: string
+  maxScore?: number
 }
 
 export interface GradeSubmissionPayload {
@@ -62,5 +63,17 @@ export async function submitAssignment(assignmentId: string, content?: string): 
 
 export async function fetchMySubmission(assignmentId: string): Promise<AssignmentSubmission | null> {
   const { data } = await api.get<AssignmentSubmission | null>(`/assignments/${assignmentId}/submissions/me`)
+  return data
+}
+
+export interface UpdateAssignmentPayload {
+  title?: string
+  description?: string
+  dueDate?: string
+  maxScore?: number
+}
+
+export async function updateAssignment(id: string, payload: UpdateAssignmentPayload): Promise<Assignment> {
+  const { data } = await api.patch<Assignment>(`/assignments/${id}`, payload)
   return data
 }

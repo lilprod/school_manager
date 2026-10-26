@@ -37,9 +37,9 @@ export async function downloadStaffAttendanceCsv(params?: { from?: string; to?: 
   triggerDownload(data, 'presences-personnel.csv')
 }
 
-export async function openReportCardPdf(studentId: string, academicYearId: string): Promise<void> {
+export async function openReportCardPdf(studentId: string, academicYearId: string, termId?: string): Promise<void> {
   const { data } = await api.get<Blob>(`/reports/report-card/${studentId}.pdf`, {
-    params: { academicYearId },
+    params: { academicYearId, termId },
     responseType: 'blob',
   })
   const url = URL.createObjectURL(data)

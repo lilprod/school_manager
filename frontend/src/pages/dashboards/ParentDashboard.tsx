@@ -5,10 +5,12 @@ import { useTranslation } from 'react-i18next'
 import { fetchAcademicYears } from '../../api/academic'
 import { fetchStudentAttendanceSummary } from '../../api/attendance'
 import { fetchReportCard } from '../../api/grading'
+import { fetchTeachersOfStudent } from '../../api/contacts'
 import { fetchInvoicesForStudent } from '../../api/invoices'
 import { requestMeeting, type RequestMeetingPayload } from '../../api/meetings'
 import { fetchMyChildren } from '../../api/students'
 import { Card, StatCard } from '../../components/Card'
+import { ReportCardSection } from '../../components/ReportCardSection'
 
 export default function ParentDashboard() {
   const { t } = useTranslation()
@@ -37,6 +39,12 @@ export default function ParentDashboard() {
     queryKey: ['invoices', 'student', selectedChild?.id],
     queryFn: () => fetchInvoicesForStudent(selectedChild!.id),
     enabled: !!selectedChild,
+  })
+
+  const teachers = useQuery({
+    queryKey: ['contacts', 'student-teachers', selectedChild?.id],
+    queryFn: () => fetchTeachersOfStudent(selectedChild!.id),
+    enabled: !!selectedChild && showMeetingForm,
   })
 
   const meetingForm = useForm<Omit<RequestMeetingPayload, 'studentId'>>()
@@ -92,6 +100,10 @@ export default function ParentDashboard() {
         </div>
       )}
 
+      {selectedChild && currentYear && (
+        <ReportCardSection studentId={selectedChild.id} academicYearId={currentYear.id} />
+      )}
+
       {selectedChild && (
         <Card>
           <p className="mb-2 text-sm font-medium text-slate-700 dark:text-slate-300">{t('invoices.title')}</p>
@@ -139,11 +151,17 @@ export default function ParentDashboard() {
               onSubmit={meetingForm.handleSubmit((values) => requestMeetingMutation.mutate(values))}
               className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-3"
             >
-              <input
-                placeholder={t('messages.recipientId') as string}
+              <select
                 className="rounded-lg border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-white"
                 {...meetingForm.register('teacherId', { required: true })}
-              />
+              >
+                <option value="">{t('meetings.selectTeacher')}</option>
+                {teachers.data?.map((teacher) => (
+                  <option key={teacher.teacherId} value={teacher.teacherId}>
+                    {teacher.firstName} {teacher.lastName} — {teacher.subjects.join(', ')}
+                  </option>
+                ))}
+              </select>
               <input
                 type="datetime-local"
                 className="rounded-lg border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-white"

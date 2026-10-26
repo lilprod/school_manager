@@ -53,7 +53,8 @@
     "groupStaff": "Staff",
     "groupAcademic": "Academic",
     "groupCommunication": "Communication",
-    "groupFinance": "Finance"
+    "groupFinance": "Finance",
+    "terms": "Terms"
   },
   "roles": {
     "SUPER_ADMIN": "Super admin",
@@ -218,7 +219,9 @@
     "viewSubmissions": "View submissions",
     "submissions": "Submissions",
     "submittedAt": "Submitted",
-    "feedback": "Feedback"
+    "feedback": "Feedback",
+    "maxScore": "Maximum score",
+    "late": "Late"
   },
   "messages": {
     "title": "Messages",
@@ -230,7 +233,8 @@
     "sent": "Sent",
     "noMessages": "No messages",
     "read": "Read",
-    "unread": "Unread"
+    "unread": "Unread",
+    "selectRecipient": "Select a recipient"
   },
   "announcements": {
     "title": "Announcements",
@@ -260,7 +264,8 @@
       "CONFIRMED": "Confirmed",
       "CANCELLED": "Cancelled",
       "COMPLETED": "Completed"
-    }
+    },
+    "selectTeacher": "Select a teacher"
   },
   "feeStructures": {
     "title": "Fee structures",
@@ -321,10 +326,26 @@
     "subject": "Subject",
     "score": "Score",
     "average": "Average",
-    "reportCard": "Report card"
+    "reportCard": "Report card",
+    "coefficient": "Coef.",
+    "downloadPdf": "Download PDF"
   },
   "language": {
     "fr": "Français",
     "en": "English"
+  },
+  "terms": {
+    "title": "Terms",
+    "create": "Add term",
+    "name": "Name",
+    "startDate": "Start",
+    "endDate": "End",
+    "noTerms": "No terms defined for this year",
+    "noTerm": "No term",
+    "term": "Term",
+    "wholeYear": "Whole year"
+  },
+  "subjects": {
+    "coefficient": "Coefficient"
   }
 }

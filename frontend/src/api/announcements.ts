@@ -8,8 +8,8 @@ export interface CreateAnnouncementPayload {
   classGroupId?: string
 }
 
-export async function fetchAnnouncements(schoolId?: string): Promise<Announcement[]> {
-  const { data } = await api.get<Announcement[]>('/announcements', { params: schoolId ? { schoolId } : undefined })
+export async function fetchAnnouncements(): Promise<Announcement[]> {
+  const { data } = await api.get<Announcement[]>('/announcements')
   return data
 }
 

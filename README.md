@@ -128,6 +128,11 @@ pour illustrer le support des parents multi-écoles.
   résumé par élève (accessible à l'élève et à ses parents)
 - **Notes** : évaluations (examen/quiz/devoir/projet), saisie en masse,
   moyennes par matière et bulletin (normalisés sur 20)
+- **Trimestres et coefficients** : trimestres par année académique (sans
+  chevauchement), coefficient par matière et par évaluation ; la moyenne
+  d'une matière pondère ses évaluations, la moyenne générale pondère les
+  matières. Bulletin (écran et PDF) filtrable par trimestre ou sur
+  l'année complète
 - **Interface** : tableaux de bord par rôle, FR/EN, mode sombre, design
   responsive
 
@@ -157,12 +162,15 @@ pour illustrer le support des parents multi-écoles.
   des contrats (temps plein/partiel/CDD, sans calcul de paie),
   évaluations
 - **Académique** : programmes (syllabus) par matière/classe/année,
-  plans de cours par enseignant, devoirs avec soumission par l'élève et
-  correction par l'enseignant
+  plans de cours par enseignant, devoirs (note maximale, modifiables)
+  avec soumission par l'élève (indicateur de retard) et correction par
+  l'enseignant, note plafonnée à la note maximale
 - **Communication** : messagerie directe entre utilisateurs (règles
-  d'accès spécifiques au parent multi-écoles), annonces ciblées par
-  rôle et/ou classe, demandes de rendez-vous parent-enseignant
-  (confirmation/annulation/clôture)
+  d'accès spécifiques au parent multi-écoles) avec annuaire de
+  contacts, annonces ciblées par rôle et/ou classe (un parent voit
+  celles de toutes les écoles de ses enfants), demandes de rendez-vous
+  parent-enseignant à choisir parmi les enseignants de la classe de
+  l'enfant (confirmation/annulation/clôture)
 - **Finance (frais de scolarité)** : barèmes de frais, facturation
   individuelle ou par classe entière, paiements partiels ou complets
   (espèces/mobile money) avec statut de facture dérivé automatiquement
@@ -181,6 +189,9 @@ gouvernance SaaS multi-écoles ; les modules opérationnels ci-dessus
 complètent la gestion quotidienne d'une école. Prochaines étapes
 suggérées :
 
+- **Évaluation (à compléter)** : calendrier d'examens (sessions, salles,
+  surveillants), coefficients propres à une classe, classement et
+  appréciations sur le bulletin, notes de devoirs intégrées au bulletin
 - **Phase 2** : bibliothèque
 - **Phase 3** : transport, analytics avancés (tableaux de bord BI),
   application mobile (React Native), intégration paiement en ligne (Stripe)

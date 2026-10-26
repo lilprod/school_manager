@@ -8,6 +8,7 @@ import { Card } from '../components/Card'
 interface FormValues {
   name: string
   code: string
+  coefficient?: number
 }
 
 export default function SubjectsPage() {
@@ -42,8 +43,13 @@ export default function SubjectsPage() {
       {showForm && (
         <Card>
           <form
-            onSubmit={handleSubmit((values) => createMutation.mutate(values))}
-            className="grid grid-cols-1 gap-3 sm:grid-cols-3"
+            onSubmit={handleSubmit((values) =>
+              createMutation.mutate({
+                ...values,
+                coefficient: Number.isFinite(values.coefficient) ? values.coefficient : undefined,
+              }),
+            )}
+            className="grid grid-cols-1 gap-3 sm:grid-cols-4"
           >
             <input
               placeholder="Mathématiques"
@@ -54,6 +60,14 @@ export default function SubjectsPage() {
               placeholder="MATH"
               className="rounded-lg border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-white"
               {...register('code', { required: true })}
+            />
+            <input
+              type="number"
+              step="0.5"
+              min="0.5"
+              placeholder={t('subjects.coefficient') as string}
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+              {...register('coefficient', { valueAsNumber: true })}
             />
             <button
               type="submit"
@@ -71,6 +85,7 @@ export default function SubjectsPage() {
             <tr className="text-slate-500 dark:text-slate-400">
               <th className="pb-2">Nom</th>
               <th className="pb-2">Code</th>
+              <th className="pb-2">{t('subjects.coefficient')}</th>
             </tr>
           </thead>
           <tbody>
@@ -78,6 +93,7 @@ export default function SubjectsPage() {
               <tr key={s.id} className="border-t border-slate-100 dark:border-slate-800">
                 <td className="py-2 text-slate-900 dark:text-white">{s.name}</td>
                 <td className="py-2 text-slate-700 dark:text-slate-300">{s.code}</td>
+                <td className="py-2 text-slate-700 dark:text-slate-300">{s.coefficient}</td>
               </tr>
             ))}
           </tbody>

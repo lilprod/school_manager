@@ -8,6 +8,8 @@ export interface CreateAssessmentPayload {
   classGroupId: string
   academicYearId: string
   maxScore?: number
+  coefficient?: number
+  termId?: string
   date: string
 }
 
@@ -43,9 +45,13 @@ export async function fetchStudentGrades(studentId: string, academicYearId?: str
   return data
 }
 
-export async function fetchReportCard(studentId: string, academicYearId: string): Promise<ReportCard> {
+export async function fetchReportCard(
+  studentId: string,
+  academicYearId: string,
+  termId?: string,
+): Promise<ReportCard> {
   const { data } = await api.get<ReportCard>(`/grades/student/${studentId}/report-card`, {
-    params: { academicYearId },
+    params: { academicYearId, termId },
   })
   return data
 }

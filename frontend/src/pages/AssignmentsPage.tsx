@@ -1,4 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { isAxiosError } from 'axios'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
@@ -9,7 +10,9 @@ import {
   fetchAssignments,
   fetchAssignmentSubmissions,
   gradeSubmission,
+  updateAssignment,
   type CreateAssignmentPayload,
+  type UpdateAssignmentPayload,
 } from '../api/assignments'
 import { Card } from '../components/Card'
 import { useAuthStore } from '../stores/auth-store'
@@ -23,6 +26,7 @@ export default function AssignmentsPage() {
   const [showForm, setShowForm] = useState(false)
   const [classGroupId, setClassGroupId] = useState('')
   const [selectedAssignmentId, setSelectedAssignmentId] = useState<string | null>(null)
+  const [editingId, setEditingId] = useState<string | null>(null)
   const [grades, setGrades] = useState<Record<string, { grade: string; feedback: string }>>({})
 
   const classGroups = useQuery({ queryKey: ['class-groups'], queryFn: fetchClassGroups })
@@ -42,6 +46,17 @@ export default function AssignmentsPage() {
   })
 
   const { register, handleSubmit, reset } = useForm<CreateAssignmentPayload>()
+  const editForm = useForm<UpdateAssignmentPayload>()
+  const selectedAssignment = assignments.data?.find((a) => a.id === selectedAssignmentId)
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: UpdateAssignmentPayload }) =>
+      updateAssignment(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['assignments'] })
+      setEditingId(null)
+    },
+  })
 
   const createMutation = useMutation({
     mutationFn: createAssignment,
@@ -87,7 +102,11 @@ export default function AssignmentsPage() {
         <Card>
           <form
             onSubmit={handleSubmit((values) =>
-              createMutation.mutate({ ...values, academicYearId: currentYear?.id ?? values.academicYearId }),
+              createMutation.mutate({
+                ...values,
+                academicYearId: currentYear?.id ?? values.academicYearId,
+                maxScore: Number.isFinite(values.maxScore) ? values.maxScore : undefined,
+              }),
             )}
             className="grid grid-cols-1 gap-3 sm:grid-cols-3"
           >
@@ -122,6 +141,14 @@ export default function AssignmentsPage() {
               type="date"
               className="rounded-lg border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-white"
               {...register('dueDate', { required: true })}
+            />
+            <input
+              type="number"
+              min={1}
+              step={0.5}
+              placeholder={t('assignments.maxScore') as string}
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+              {...register('maxScore', { valueAsNumber: true })}
             />
             <input
               placeholder={t('assignments.description') as string}
@@ -162,6 +189,7 @@ export default function AssignmentsPage() {
               <th className="pb-2">{t('grades.subject')}</th>
               <th className="pb-2">{t('students.class')}</th>
               <th className="pb-2">{t('assignments.dueDate')}</th>
+              <th className="pb-2">{t('assignments.maxScore')}</th>
               <th className="pb-2">{t('common.actions')}</th>
             </tr>
           </thead>
@@ -172,7 +200,20 @@ export default function AssignmentsPage() {
                 <td className="py-2 text-slate-700 dark:text-slate-300">{a.subject?.name}</td>
                 <td className="py-2 text-slate-700 dark:text-slate-300">{a.classGroup?.name}</td>
                 <td className="py-2 text-slate-700 dark:text-slate-300">{a.dueDate.slice(0, 10)}</td>
+                <td className="py-2 text-slate-700 dark:text-slate-300">{a.maxScore}</td>
                 <td className="py-2 space-x-3">
+                  {isTeacher && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        editForm.reset({ title: a.title, dueDate: a.dueDate.slice(0, 10), maxScore: a.maxScore })
+                        setEditingId(a.id)
+                      }}
+                      className="text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+                    >
+                      {t('common.edit')}
+                    </button>
+                  )}
                   {isTeacher && (
                     <button
                       type="button"
@@ -201,6 +242,61 @@ export default function AssignmentsPage() {
         </table>
       </Card>
 
+      {isTeacher && editingId && (
+        <Card>
+          <form
+            onSubmit={editForm.handleSubmit((values) =>
+              updateMutation.mutate({
+                id: editingId,
+                payload: {
+                  title: values.title,
+                  dueDate: values.dueDate,
+                  maxScore: Number.isFinite(values.maxScore) ? values.maxScore : undefined,
+                },
+              }),
+            )}
+            className="grid grid-cols-1 gap-3 sm:grid-cols-4"
+          >
+            <input
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+              {...editForm.register('title', { required: true })}
+            />
+            <input
+              type="date"
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+              {...editForm.register('dueDate', { required: true })}
+            />
+            <input
+              type="number"
+              min={1}
+              step={0.5}
+              className="rounded-lg border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+              {...editForm.register('maxScore', { valueAsNumber: true })}
+            />
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white dark:bg-slate-100 dark:text-slate-900"
+              >
+                {t('common.save')}
+              </button>
+              <button
+                type="button"
+                onClick={() => setEditingId(null)}
+                className="text-sm text-slate-500 hover:underline"
+              >
+                {t('common.cancel')}
+              </button>
+            </div>
+          </form>
+          {updateMutation.error && isAxiosError(updateMutation.error) && (
+            <p className="mt-3 text-sm text-red-600">
+              {(updateMutation.error.response?.data as { message?: string } | undefined)?.message}
+            </p>
+          )}
+        </Card>
+      )}
+
       {isTeacher && selectedAssignmentId && submissions.data && (
         <Card>
           <p className="mb-3 text-sm font-medium text-slate-700 dark:text-slate-300">
@@ -227,11 +323,19 @@ export default function AssignmentsPage() {
                     <td className="py-2 text-slate-900 dark:text-white">
                       {sub.student?.user?.firstName} {sub.student?.user?.lastName}
                     </td>
-                    <td className="py-2 text-slate-700 dark:text-slate-300">{sub.submittedAt.slice(0, 10)}</td>
+                    <td className="py-2 text-slate-700 dark:text-slate-300">
+                      {sub.submittedAt.slice(0, 10)}
+                      {sub.isLate && (
+                        <span className="ml-2 rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700 dark:bg-red-500/10 dark:text-red-300">
+                          {t('assignments.late')}
+                        </span>
+                      )}
+                    </td>
                     <td className="py-2">
                       <input
                         type="number"
                         min={0}
+                        max={selectedAssignment?.maxScore}
                         step={0.5}
                         value={current.grade}
                         onChange={(e) =>
@@ -277,6 +381,11 @@ export default function AssignmentsPage() {
               })}
             </tbody>
           </table>
+          {gradeMutation.error && isAxiosError(gradeMutation.error) && (
+            <p className="mt-3 text-sm text-red-600">
+              {(gradeMutation.error.response?.data as { message?: string } | undefined)?.message}
+            </p>
+          )}
         </Card>
       )}
     </div>

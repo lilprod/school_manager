@@ -25,6 +25,7 @@ import StudentsPage from './pages/StudentsPage'
 import SubjectsPage from './pages/SubjectsPage'
 import SyllabiPage from './pages/SyllabiPage'
 import TeachersPage from './pages/TeachersPage'
+import TermsPage from './pages/TermsPage'
 import TimetablePage from './pages/TimetablePage'
 import { ProtectedRoute } from './routes/ProtectedRoute'
 
@@ -119,6 +120,14 @@ export default function App() {
           element={
             <ProtectedRoute roles={['SUPER_ADMIN']}>
               <PlatformPlansPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/terms"
+          element={
+            <ProtectedRoute roles={['ADMIN']}>
+              <TermsPage />
             </ProtectedRoute>
           }
         />

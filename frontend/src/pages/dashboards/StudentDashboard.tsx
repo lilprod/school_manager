@@ -8,8 +8,19 @@ import { fetchReportCard } from '../../api/grading'
 import { fetchInvoicesForStudent } from '../../api/invoices'
 import { fetchMyStudentProfile } from '../../api/students'
 import { Card, StatCard } from '../../components/Card'
+import { ReportCardSection } from '../../components/ReportCardSection'
 
-function AssignmentRow({ assignmentId, title, dueDate }: { assignmentId: string; title: string; dueDate: string }) {
+function AssignmentRow({
+  assignmentId,
+  title,
+  dueDate,
+  maxScore,
+}: {
+  assignmentId: string
+  title: string
+  dueDate: string
+  maxScore: number
+}) {
   const { t } = useTranslation()
   const queryClient = useQueryClient()
   const [content, setContent] = useState('')
@@ -35,7 +46,8 @@ function AssignmentRow({ assignmentId, title, dueDate }: { assignmentId: string;
       {submission.data ? (
         <p className="text-xs text-slate-500 dark:text-slate-400">
           {t('messages.sent')} {submission.data.submittedAt.slice(0, 10)}
-          {submission.data.grade != null ? ` — ${submission.data.grade}/20` : ''}
+          {submission.data.isLate ? ` — ${t('assignments.late')}` : ''}
+          {submission.data.grade != null ? ` — ${submission.data.grade}/${maxScore}` : ''}
         </p>
       ) : (
         <div className="flex gap-2">
@@ -120,26 +132,8 @@ export default function StudentDashboard() {
         </Card>
       </div>
 
-      {reportCard.data && reportCard.data.subjects.length > 0 && (
-        <Card>
-          <p className="mb-3 text-sm font-medium text-slate-700 dark:text-slate-300">{t('grades.reportCard')}</p>
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="text-slate-500 dark:text-slate-400">
-                <th className="pb-2">{t('grades.subject')}</th>
-                <th className="pb-2">{t('grades.average')}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {reportCard.data.subjects.map((s) => (
-                <tr key={s.subjectId} className="border-t border-slate-100 dark:border-slate-800">
-                  <td className="py-2 text-slate-900 dark:text-white">{s.subjectName}</td>
-                  <td className="py-2 text-slate-700 dark:text-slate-300">{s.average}/20</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
+      {profile.data && currentYear && (
+        <ReportCardSection studentId={profile.data.id} academicYearId={currentYear.id} />
       )}
 
       <Card>
@@ -147,7 +141,7 @@ export default function StudentDashboard() {
         {assignments.data && assignments.data.length > 0 ? (
           <ul>
             {assignments.data.map((a) => (
-              <AssignmentRow key={a.id} assignmentId={a.id} title={a.title} dueDate={a.dueDate} />
+              <AssignmentRow key={a.id} assignmentId={a.id} title={a.title} dueDate={a.dueDate} maxScore={a.maxScore} />
             ))}
           </ul>
         ) : (

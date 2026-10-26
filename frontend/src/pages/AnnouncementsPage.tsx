@@ -24,11 +24,10 @@ export default function AnnouncementsPage() {
   const canCreate = user?.role === 'ADMIN' || user?.role === 'TEACHER'
   const canDelete = user?.role === 'ADMIN'
 
-  const canLoad = !!user && (user.role !== 'PARENT' || !!user.schoolId)
   const announcements = useQuery({
-    queryKey: ['announcements', user?.schoolId],
-    queryFn: () => fetchAnnouncements(user?.schoolId ?? undefined),
-    enabled: canLoad,
+    queryKey: ['announcements', user?.role],
+    queryFn: fetchAnnouncements,
+    enabled: !!user,
   })
   const classGroups = useQuery({
     queryKey: ['class-groups'],
@@ -132,6 +131,7 @@ export default function AnnouncementsPage() {
                   <p className="mt-1 text-sm text-slate-700 dark:text-slate-300">{announcement.content}</p>
                   <div className="mt-2 flex gap-3 text-xs text-slate-500 dark:text-slate-400">
                     <span>{t(`announcements.audience.${announcement.audience}`)}</span>
+                    {announcement.school && <span>{announcement.school.name}</span>}
                     {announcement.classGroup && <span>{announcement.classGroup.name}</span>}
                     <span>{new Date(announcement.publishedAt).toLocaleString()}</span>
                   </div>

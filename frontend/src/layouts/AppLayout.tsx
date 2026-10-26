@@ -24,6 +24,7 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/platform/schools', labelKey: 'nav.platformSchools', roles: ['SUPER_ADMIN'] },
   { to: '/platform/plans', labelKey: 'nav.platformPlans', roles: ['SUPER_ADMIN'] },
 
+  { to: '/terms', labelKey: 'nav.terms', roles: ['ADMIN'], group: 'nav.groupAdmin' },
   { to: '/rooms', labelKey: 'nav.rooms', roles: ['ADMIN', 'TEACHER'], group: 'nav.groupAdmin' },
   { to: '/timetable', labelKey: 'nav.timetable', roles: ['ADMIN', 'TEACHER', 'STUDENT'], group: 'nav.groupAdmin' },
 

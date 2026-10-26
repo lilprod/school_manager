@@ -26,7 +26,7 @@ export async function createClassGroup(payload: { name: string; level: string })
   return data
 }
 
-export async function createSubject(payload: { name: string; code: string }): Promise<Subject> {
+export async function createSubject(payload: { name: string; code: string; coefficient?: number }): Promise<Subject> {
   const { data } = await api.post<Subject>('/subjects', payload)
   return data
 }

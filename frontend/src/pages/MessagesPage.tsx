@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
+import { fetchContacts } from '../api/contacts'
 import { fetchInbox, fetchSentMessages, markMessageAsRead, sendMessage, type SendMessagePayload } from '../api/messages'
 import { Card } from '../components/Card'
 import type { Message } from '../types'
@@ -16,6 +17,8 @@ export default function MessagesPage() {
 
   const inbox = useQuery({ queryKey: ['messages', 'inbox'], queryFn: fetchInbox })
   const sent = useQuery({ queryKey: ['messages', 'sent'], queryFn: fetchSentMessages })
+
+  const contacts = useQuery({ queryKey: ['contacts'], queryFn: () => fetchContacts(), enabled: showForm })
 
   const { register, handleSubmit, reset } = useForm<SendMessagePayload>()
 
@@ -62,11 +65,18 @@ export default function MessagesPage() {
             onSubmit={handleSubmit((values) => sendMutation.mutate(values))}
             className="grid grid-cols-1 gap-3 sm:grid-cols-3"
           >
-            <input
-              placeholder={t('messages.recipientId') as string}
+            <select
               className="rounded-lg border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-white"
               {...register('recipientId', { required: true })}
-            />
+            >
+              <option value="">{t('messages.selectRecipient')}</option>
+              {contacts.data?.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.firstName} {c.lastName} — {t(`roles.${c.role}`)}
+                  {c.schoolName ? ` (${c.schoolName})` : ''}
+                </option>
+              ))}
+            </select>
             <textarea
               placeholder={t('messages.content') as string}
               className="rounded-lg border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-800 dark:text-white sm:col-span-2"

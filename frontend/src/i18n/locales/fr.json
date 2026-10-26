@@ -53,7 +53,8 @@
     "groupStaff": "Personnel",
     "groupAcademic": "Académique",
     "groupCommunication": "Communication",
-    "groupFinance": "Finance"
+    "groupFinance": "Finance",
+    "terms": "Trimestres"
   },
   "roles": {
     "SUPER_ADMIN": "Super-administrateur",
@@ -218,7 +219,9 @@
     "viewSubmissions": "Voir les copies",
     "submissions": "Copies rendues",
     "submittedAt": "Rendu le",
-    "feedback": "Commentaire"
+    "feedback": "Commentaire",
+    "maxScore": "Note maximale",
+    "late": "En retard"
   },
   "messages": {
     "title": "Messages",
@@ -230,7 +233,8 @@
     "sent": "Envoyés",
     "noMessages": "Aucun message",
     "read": "Lu",
-    "unread": "Non lu"
+    "unread": "Non lu",
+    "selectRecipient": "Choisir un destinataire"
   },
   "announcements": {
     "title": "Annonces",
@@ -260,7 +264,8 @@
       "CONFIRMED": "Confirmé",
       "CANCELLED": "Annulé",
       "COMPLETED": "Terminé"
-    }
+    },
+    "selectTeacher": "Choisir un enseignant"
   },
   "feeStructures": {
     "title": "Barèmes de frais",
@@ -321,10 +326,26 @@
     "subject": "Matière",
     "score": "Note",
     "average": "Moyenne",
-    "reportCard": "Bulletin"
+    "reportCard": "Bulletin",
+    "coefficient": "Coef.",
+    "downloadPdf": "Télécharger le PDF"
   },
   "language": {
     "fr": "Français",
     "en": "English"
+  },
+  "terms": {
+    "title": "Trimestres",
+    "create": "Ajouter un trimestre",
+    "name": "Nom",
+    "startDate": "Début",
+    "endDate": "Fin",
+    "noTerms": "Aucun trimestre défini pour cette année",
+    "noTerm": "Sans trimestre",
+    "term": "Trimestre",
+    "wholeYear": "Année complète"
+  },
+  "subjects": {
+    "coefficient": "Coefficient"
   }
 }
