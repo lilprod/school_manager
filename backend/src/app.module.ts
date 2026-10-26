@@ -31,6 +31,7 @@ import { MeetingsModule } from './meetings/meetings.module.js';
 import { FeeStructuresModule } from './fee-structures/fee-structures.module.js';
 import { InvoicesModule } from './invoices/invoices.module.js';
 import { ExpensesModule } from './expenses/expenses.module.js';
+import { ReportsModule } from './reports/reports.module.js';
 
 @Module({
   imports: [
@@ -63,6 +64,7 @@ import { ExpensesModule } from './expenses/expenses.module.js';
     FeeStructuresModule,
     InvoicesModule,
     ExpensesModule,
+    ReportsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },
