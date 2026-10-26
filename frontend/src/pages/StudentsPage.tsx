@@ -1,9 +1,17 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import type { ChangeEvent } from 'react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { fetchAcademicYears, fetchClassGroups } from '../api/academic'
-import { createStudent, fetchStudents, type CreateStudentPayload } from '../api/students'
+import {
+  createStudent,
+  fetchStudents,
+  graduateStudent,
+  openStudentIdCard,
+  uploadStudentPhoto,
+  type CreateStudentPayload,
+} from '../api/students'
 import { Card } from '../components/Card'
 
 export default function StudentsPage() {
@@ -29,6 +37,30 @@ export default function StudentsPage() {
       setShowForm(false)
     },
   })
+
+  const photoMutation = useMutation({
+    mutationFn: ({ id, file }: { id: string; file: File }) => uploadStudentPhoto(id, file),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['students'] }),
+  })
+
+  const graduateMutation = useMutation({
+    mutationFn: graduateStudent,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['students'] }),
+  })
+
+  function handlePhotoChange(studentId: string, e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (file) {
+      photoMutation.mutate({ id: studentId, file })
+    }
+    e.target.value = ''
+  }
+
+  function handleGraduate(studentId: string) {
+    if (window.confirm(t('students.confirmGraduate') as string)) {
+      graduateMutation.mutate(studentId)
+    }
+  }
 
   const currentYear = years.data?.find((y) => y.isCurrent) ?? years.data?.[0]
 
@@ -126,6 +158,7 @@ export default function StudentsPage() {
                 <th className="pb-2">{t('students.studentNumber')}</th>
                 <th className="pb-2">{t('students.class')}</th>
                 <th className="pb-2">{t('students.email')}</th>
+                <th className="pb-2">{t('common.actions')}</th>
               </tr>
             </thead>
             <tbody>
@@ -136,6 +169,33 @@ export default function StudentsPage() {
                   <td className="py-2 text-slate-700 dark:text-slate-300">{s.studentNumber}</td>
                   <td className="py-2 text-slate-700 dark:text-slate-300">{s.enrollments[0]?.classGroup.name}</td>
                   <td className="py-2 text-slate-700 dark:text-slate-300">{s.user.email}</td>
+                  <td className="py-2">
+                    <div className="flex items-center gap-3">
+                      <label className="cursor-pointer text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400">
+                        {t('students.photo')}
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png"
+                          className="hidden"
+                          onChange={(e) => handlePhotoChange(s.id, e)}
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => openStudentIdCard(s.id)}
+                        className="text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+                      >
+                        {t('students.idCard')}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleGraduate(s.id)}
+                        className="text-sm font-medium text-red-600 hover:underline dark:text-red-400"
+                      >
+                        {t('students.graduate')}
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>

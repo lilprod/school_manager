@@ -9,6 +9,7 @@ interface NavItem {
   to: string
   labelKey: string
   roles: Role[]
+  group?: string
 }
 
 const NAV_ITEMS: NavItem[] = [
@@ -22,6 +23,49 @@ const NAV_ITEMS: NavItem[] = [
   { to: '/grades', labelKey: 'nav.grades', roles: ['ADMIN', 'TEACHER'] },
   { to: '/platform/schools', labelKey: 'nav.platformSchools', roles: ['SUPER_ADMIN'] },
   { to: '/platform/plans', labelKey: 'nav.platformPlans', roles: ['SUPER_ADMIN'] },
+
+  { to: '/rooms', labelKey: 'nav.rooms', roles: ['ADMIN', 'TEACHER'], group: 'nav.groupAdmin' },
+  { to: '/timetable', labelKey: 'nav.timetable', roles: ['ADMIN', 'TEACHER', 'STUDENT'], group: 'nav.groupAdmin' },
+
+  {
+    to: '/staff-attendance',
+    labelKey: 'nav.staffAttendance',
+    roles: ['ADMIN', 'TEACHER'],
+    group: 'nav.groupStaff',
+  },
+
+  { to: '/syllabi', labelKey: 'nav.syllabi', roles: ['ADMIN', 'TEACHER'], group: 'nav.groupAcademic' },
+  { to: '/lesson-plans', labelKey: 'nav.lessonPlans', roles: ['ADMIN', 'TEACHER'], group: 'nav.groupAcademic' },
+  {
+    to: '/assignments',
+    labelKey: 'nav.assignments',
+    roles: ['ADMIN', 'TEACHER', 'STUDENT'],
+    group: 'nav.groupAcademic',
+  },
+
+  {
+    to: '/messages',
+    labelKey: 'nav.messages',
+    roles: ['ADMIN', 'TEACHER', 'STUDENT', 'PARENT'],
+    group: 'nav.groupCommunication',
+  },
+  {
+    to: '/announcements',
+    labelKey: 'nav.announcements',
+    roles: ['ADMIN', 'TEACHER', 'STUDENT', 'PARENT'],
+    group: 'nav.groupCommunication',
+  },
+  {
+    to: '/meetings',
+    labelKey: 'nav.meetings',
+    roles: ['ADMIN', 'TEACHER', 'PARENT'],
+    group: 'nav.groupCommunication',
+  },
+
+  { to: '/fee-structures', labelKey: 'nav.feeStructures', roles: ['ADMIN'], group: 'nav.groupFinance' },
+  { to: '/invoices', labelKey: 'nav.invoices', roles: ['ADMIN'], group: 'nav.groupFinance' },
+  { to: '/expenses', labelKey: 'nav.expenses', roles: ['ADMIN'], group: 'nav.groupFinance' },
+  { to: '/reports', labelKey: 'nav.reports', roles: ['ADMIN'], group: 'nav.groupFinance' },
 ]
 
 export function AppLayout() {
@@ -49,20 +93,26 @@ export function AppLayout() {
       <aside className="flex w-60 flex-col border-r border-slate-200 bg-white px-4 py-6 dark:border-slate-800 dark:bg-slate-900">
         <h1 className="mb-8 px-2 text-lg font-semibold text-slate-900 dark:text-white">{t('app.name')}</h1>
         <nav className="flex flex-1 flex-col gap-1">
-          {items.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              className={({ isActive }) =>
-                `rounded-lg px-3 py-2 text-sm font-medium transition ${
-                  isActive
-                    ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300'
-                    : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
-                }`
-              }
-            >
-              {t(item.labelKey)}
-            </NavLink>
+          {items.map((item, index) => (
+            <div key={item.to}>
+              {item.group && item.group !== items[index - 1]?.group && (
+                <p className="mt-4 px-3 pb-1 text-xs font-semibold uppercase text-slate-400 dark:text-slate-500">
+                  {t(item.group)}
+                </p>
+              )}
+              <NavLink
+                to={item.to}
+                className={({ isActive }) =>
+                  `block rounded-lg px-3 py-2 text-sm font-medium transition ${
+                    isActive
+                      ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300'
+                      : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'
+                  }`
+                }
+              >
+                {t(item.labelKey)}
+              </NavLink>
+            </div>
           ))}
         </nav>
       </aside>

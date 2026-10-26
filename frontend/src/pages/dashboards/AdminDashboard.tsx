@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import { fetchMySchool, fetchClassGroups } from '../../api/academic'
+import { fetchReportsSummary } from '../../api/reports'
 import { fetchStudents } from '../../api/students'
 import { fetchTeachers } from '../../api/teachers'
 import { StatCard, Card } from '../../components/Card'
@@ -12,6 +13,7 @@ export default function AdminDashboard() {
   const students = useQuery({ queryKey: ['students'], queryFn: () => fetchStudents() })
   const teachers = useQuery({ queryKey: ['teachers'], queryFn: fetchTeachers })
   const classGroups = useQuery({ queryKey: ['class-groups'], queryFn: fetchClassGroups })
+  const summary = useQuery({ queryKey: ['reports', 'summary'], queryFn: fetchReportsSummary })
 
   return (
     <div className="space-y-6">
@@ -27,6 +29,17 @@ export default function AdminDashboard() {
           <p className="mt-1 text-lg font-medium text-slate-900 dark:text-white">{school.data.name}</p>
           {school.data.address && <p className="text-sm text-slate-500 dark:text-slate-400">{school.data.address}</p>}
         </Card>
+      )}
+
+      {summary.data && (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          <StatCard label={t('reports.attendanceRate')} value={`${summary.data.attendanceRatePercent}%`} />
+          <StatCard
+            label={t('reports.outstandingInvoices')}
+            value={`${summary.data.outstandingInvoicesTotal}`}
+          />
+          <StatCard label={t('reports.expensesThisMonth')} value={`${summary.data.totalExpensesThisMonth}`} />
+        </div>
       )}
     </div>
   )

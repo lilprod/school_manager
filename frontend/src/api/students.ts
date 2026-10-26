@@ -38,3 +38,23 @@ export async function fetchMyChildren(): Promise<StudentProfile[]> {
   const { data } = await api.get<StudentProfile[]>('/students/my-children')
   return data
 }
+
+export async function uploadStudentPhoto(id: string, file: File): Promise<StudentProfile> {
+  const formData = new FormData()
+  formData.append('file', file)
+  const { data } = await api.post<StudentProfile>(`/students/${id}/photo`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })
+  return data
+}
+
+export async function graduateStudent(id: string): Promise<StudentProfile> {
+  const { data } = await api.post<StudentProfile>(`/students/${id}/graduate`)
+  return data
+}
+
+export async function openStudentIdCard(id: string): Promise<void> {
+  const { data } = await api.get<Blob>(`/students/${id}/id-card`, { responseType: 'blob' })
+  const url = URL.createObjectURL(data)
+  window.open(url, '_blank')
+}

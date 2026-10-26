@@ -35,7 +35,25 @@
     "academicYears": "Années académiques",
     "school": "École",
     "platformSchools": "Écoles",
-    "platformPlans": "Plans"
+    "platformPlans": "Plans",
+    "rooms": "Salles",
+    "timetable": "Emploi du temps",
+    "staffAttendance": "Présence du personnel",
+    "syllabi": "Programmes",
+    "lessonPlans": "Plans de cours",
+    "assignments": "Devoirs",
+    "messages": "Messages",
+    "announcements": "Annonces",
+    "meetings": "Rendez-vous",
+    "feeStructures": "Barèmes de frais",
+    "invoices": "Factures",
+    "expenses": "Dépenses",
+    "reports": "Rapports",
+    "groupAdmin": "Administratif",
+    "groupStaff": "Personnel",
+    "groupAcademic": "Académique",
+    "groupCommunication": "Communication",
+    "groupFinance": "Finance"
   },
   "roles": {
     "SUPER_ADMIN": "Super-administrateur",
@@ -121,7 +139,170 @@
     "class": "Classe",
     "email": "E-mail",
     "addStudent": "Ajouter un élève",
-    "noStudents": "Aucun élève trouvé"
+    "noStudents": "Aucun élève trouvé",
+    "photo": "Photo",
+    "idCard": "Carte d'élève",
+    "graduate": "Diplômer",
+    "confirmGraduate": "Confirmer le passage de cet élève au statut diplômé ?"
+  },
+  "teachers": {
+    "photo": "Photo",
+    "details": "Détails"
+  },
+  "rooms": {
+    "title": "Salles",
+    "create": "Ajouter une salle",
+    "name": "Nom",
+    "capacity": "Capacité",
+    "type": "Type",
+    "noRooms": "Aucune salle"
+  },
+  "timetable": {
+    "title": "Emploi du temps",
+    "create": "Ajouter un créneau",
+    "selectClass": "Sélectionner une classe",
+    "selectYear": "Sélectionner une année",
+    "subject": "Matière",
+    "teacher": "Enseignant",
+    "room": "Salle",
+    "dayOfWeek": "Jour",
+    "day1": "Lundi",
+    "day2": "Mardi",
+    "day3": "Mercredi",
+    "day4": "Jeudi",
+    "day5": "Vendredi",
+    "day6": "Samedi",
+    "day7": "Dimanche",
+    "noSlots": "Aucun créneau",
+    "conflictError": "Ce créneau est en conflit avec un créneau existant (enseignant ou salle déjà occupé)."
+  },
+  "staffAttendance": {
+    "title": "Présence du personnel",
+    "allTeachers": "Tous les enseignants",
+    "from": "Du",
+    "to": "Au",
+    "date": "Date",
+    "note": "Remarque",
+    "markTitle": "Marquer une présence",
+    "selectTeacher": "Sélectionner un enseignant",
+    "notePlaceholder": "Remarque (optionnel)"
+  },
+  "contracts": {
+    "title": "Contrats",
+    "create": "Ajouter un contrat",
+    "fullTime": "Temps plein",
+    "partTime": "Temps partiel",
+    "fixedTerm": "CDD",
+    "salary": "Salaire"
+  },
+  "evaluations": {
+    "title": "Évaluations",
+    "create": "Ajouter une évaluation",
+    "score": "Note",
+    "comments": "Commentaires"
+  },
+  "syllabi": {
+    "title": "Programmes",
+    "description": "Description"
+  },
+  "lessonPlans": {
+    "title": "Plans de cours",
+    "objectives": "Objectifs",
+    "content": "Contenu"
+  },
+  "assignments": {
+    "title": "Devoirs",
+    "titleField": "Titre",
+    "description": "Description",
+    "dueDate": "Date limite",
+    "viewSubmissions": "Voir les copies",
+    "submissions": "Copies rendues",
+    "submittedAt": "Rendu le",
+    "feedback": "Commentaire"
+  },
+  "messages": {
+    "title": "Messages",
+    "compose": "Nouveau message",
+    "recipientId": "ID du destinataire",
+    "content": "Message",
+    "send": "Envoyer",
+    "inbox": "Boîte de réception",
+    "sent": "Envoyés",
+    "noMessages": "Aucun message",
+    "read": "Lu",
+    "unread": "Non lu"
+  },
+  "announcements": {
+    "title": "Annonces",
+    "create": "Nouvelle annonce",
+    "titleField": "Titre",
+    "content": "Contenu",
+    "allClasses": "Toutes les classes",
+    "noAnnouncements": "Aucune annonce",
+    "audience": {
+      "ALL": "Tout le monde",
+      "ADMIN": "Administrateurs",
+      "TEACHER": "Enseignants",
+      "STUDENT": "Élèves",
+      "PARENT": "Parents"
+    }
+  },
+  "meetings": {
+    "title": "Rendez-vous",
+    "noMeetings": "Aucun rendez-vous",
+    "with": "Avec {{name}}",
+    "about": "Concernant {{name}}",
+    "confirm": "Confirmer",
+    "cancel": "Annuler",
+    "complete": "Marquer terminé",
+    "status": {
+      "REQUESTED": "Demandé",
+      "CONFIRMED": "Confirmé",
+      "CANCELLED": "Annulé",
+      "COMPLETED": "Terminé"
+    }
+  },
+  "feeStructures": {
+    "title": "Barèmes de frais",
+    "name": "Nom",
+    "amount": "Montant",
+    "allClasses": "Toutes les classes"
+  },
+  "invoices": {
+    "title": "Factures",
+    "billClass": "Facturer la classe",
+    "feeStructure": "Barème de frais",
+    "allStatuses": "Tous les statuts",
+    "statusLabel": "Statut",
+    "paidAmount": "Montant payé",
+    "balance": "Solde",
+    "dueDate": "Échéance",
+    "recordPayment": "Enregistrer un paiement",
+    "status": {
+      "PENDING": "En attente",
+      "PARTIALLY_PAID": "Partiellement payée",
+      "PAID": "Payée",
+      "OVERDUE": "En retard",
+      "CANCELLED": "Annulée"
+    }
+  },
+  "expenses": {
+    "title": "Dépenses",
+    "category": "Catégorie",
+    "amount": "Montant",
+    "description": "Description"
+  },
+  "reports": {
+    "title": "Rapports",
+    "attendanceRate": "Taux de présence",
+    "outstandingInvoices": "Factures impayées",
+    "expensesThisMonth": "Dépenses ce mois-ci",
+    "attendanceCsv": "Export des présences (CSV)",
+    "financeCsv": "Export financier (CSV)",
+    "staffAttendanceCsv": "Export des présences du personnel (CSV)",
+    "download": "Télécharger",
+    "reportCardTitle": "Bulletins scolaires",
+    "reportCardHint": "Les bulletins se téléchargent par élève depuis la fiche de l'élève."
   },
   "attendance": {
     "title": "Présences",

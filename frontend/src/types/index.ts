@@ -173,3 +173,213 @@ export interface ReportCard {
   subjects: ReportCardSubject[]
   overallAverage: number
 }
+
+// --- Administratif ---
+
+export interface Room {
+  id: string
+  name: string
+  capacity?: number | null
+  type?: string | null
+}
+
+export interface TimetableSlot {
+  id: string
+  classGroupId: string
+  classGroup?: ClassGroup
+  subjectId: string
+  subject?: Subject
+  teacherId: string
+  teacher?: TeacherProfile
+  roomId?: string | null
+  room?: Room | null
+  academicYearId: string
+  dayOfWeek: number
+  startTime: string
+  endTime: string
+}
+
+// --- Staff ---
+
+export interface StaffAttendanceRecord {
+  id: string
+  teacherId: string
+  teacher?: TeacherProfile
+  date: string
+  status: AttendanceStatus
+  note?: string | null
+}
+
+export type ContractType = 'FULL_TIME' | 'PART_TIME' | 'FIXED_TERM'
+
+export interface Contract {
+  id: string
+  teacherId: string
+  contractType: ContractType
+  salaryAmount: number
+  currency: string
+  startDate: string
+  endDate?: string | null
+  createdAt: string
+}
+
+export interface Evaluation {
+  id: string
+  teacherId: string
+  evaluatorId: string
+  evaluator?: { id: string; firstName: string; lastName: string; email: string }
+  evaluationDate: string
+  score: number
+  comments?: string | null
+}
+
+// --- Académique ---
+
+export interface Syllabus {
+  id: string
+  subjectId: string
+  subject?: Subject
+  classGroupId: string
+  classGroup?: ClassGroup
+  academicYearId: string
+  academicYear?: AcademicYear
+  title: string
+  description?: string | null
+}
+
+export interface LessonPlan {
+  id: string
+  teacherId: string
+  subjectId: string
+  subject?: Subject
+  classGroupId: string
+  classGroup?: ClassGroup
+  date: string
+  title: string
+  objectives?: string | null
+  content?: string | null
+}
+
+export interface AssignmentSubmission {
+  id: string
+  assignmentId: string
+  studentId: string
+  student?: StudentProfile
+  content?: string | null
+  submittedAt: string
+  grade?: number | null
+  feedback?: string | null
+}
+
+export interface Assignment {
+  id: string
+  title: string
+  description?: string | null
+  subjectId: string
+  subject?: Subject
+  classGroupId: string
+  classGroup?: ClassGroup
+  academicYearId: string
+  dueDate: string
+  createdById: string
+}
+
+// --- Communication ---
+
+export interface Message {
+  id: string
+  senderId: string
+  sender?: { id: string; firstName: string; lastName: string; email: string }
+  recipientId: string
+  recipient?: { id: string; firstName: string; lastName: string; email: string }
+  content: string
+  readAt?: string | null
+  createdAt: string
+}
+
+export type AnnouncementAudience = 'ALL' | 'ADMIN' | 'TEACHER' | 'STUDENT' | 'PARENT'
+
+export interface Announcement {
+  id: string
+  title: string
+  content: string
+  audience: AnnouncementAudience
+  classGroupId?: string | null
+  classGroup?: ClassGroup | null
+  authorId: string
+  publishedAt: string
+}
+
+export type MeetingStatus = 'REQUESTED' | 'CONFIRMED' | 'CANCELLED' | 'COMPLETED'
+
+export interface ParentTeacherMeeting {
+  id: string
+  teacherId: string
+  teacher?: TeacherProfile
+  parentId: string
+  studentId: string
+  student?: StudentProfile
+  scheduledAt: string
+  status: MeetingStatus
+  notes?: string | null
+}
+
+// --- Finance ---
+
+export interface FeeStructure {
+  id: string
+  schoolId: string
+  academicYearId: string
+  classGroupId?: string | null
+  classGroup?: ClassGroup | null
+  name: string
+  amount: number
+  currency: string
+}
+
+export type InvoiceStatus = 'PENDING' | 'PARTIALLY_PAID' | 'PAID' | 'OVERDUE' | 'CANCELLED'
+
+export interface FeePayment {
+  id: string
+  invoiceId: string
+  amount: number
+  method: PaymentMethod
+  reference?: string | null
+  paidAt: string
+}
+
+export interface Invoice {
+  id: string
+  studentId: string
+  student?: StudentProfile
+  feeStructureId?: string | null
+  feeStructure?: FeeStructure | null
+  amount: number
+  currency: string
+  dueDate: string
+  status: InvoiceStatus
+  paidAmount: number
+  balance: number
+  payments?: FeePayment[]
+}
+
+export interface Expense {
+  id: string
+  schoolId: string
+  category: string
+  amount: number
+  currency: string
+  description?: string | null
+  date: string
+}
+
+// --- Rapports ---
+
+export interface ReportsSummary {
+  totalStudents: number
+  totalTeachers: number
+  totalClasses: number
+  attendanceRatePercent: number
+  outstandingInvoicesTotal: number
+  totalExpensesThisMonth: number
+}
