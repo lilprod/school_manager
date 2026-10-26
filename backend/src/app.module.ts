@@ -25,6 +25,9 @@ import { AssignmentsModule } from './assignments/assignments.module.js';
 import { StaffAttendanceModule } from './staff-attendance/staff-attendance.module.js';
 import { ContractsModule } from './contracts/contracts.module.js';
 import { EvaluationsModule } from './evaluations/evaluations.module.js';
+import { MessagesModule } from './messages/messages.module.js';
+import { AnnouncementsModule } from './announcements/announcements.module.js';
+import { MeetingsModule } from './meetings/meetings.module.js';
 
 @Module({
   imports: [
@@ -51,6 +54,9 @@ import { EvaluationsModule } from './evaluations/evaluations.module.js';
     StaffAttendanceModule,
     ContractsModule,
     EvaluationsModule,
+    MessagesModule,
+    AnnouncementsModule,
+    MeetingsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },
