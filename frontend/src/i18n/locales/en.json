@@ -1,0 +1,389 @@
+{
+  "app": {
+    "name": "School Manager"
+  },
+  "common": {
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "create": "Create",
+    "edit": "Edit",
+    "delete": "Delete",
+    "actions": "Actions",
+    "search": "Search",
+    "back": "Back",
+    "logout": "Log out",
+    "error": "Something went wrong",
+    "noData": "No data",
+    "yes": "Yes"
+  },
+  "auth": {
+    "login": "Sign in",
+    "email": "Email address",
+    "password": "Password",
+    "loginButton": "Sign in",
+    "loginError": "Invalid credentials. Please try again.",
+    "welcome": "Welcome to the school management platform"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "students": "Students",
+    "teachers": "Teachers",
+    "classes": "Classes",
+    "subjects": "Subjects",
+    "attendance": "Attendance",
+    "grades": "Grades",
+    "academicYears": "Academic years",
+    "school": "School",
+    "platformSchools": "Schools",
+    "platformPlans": "Plans",
+    "rooms": "Rooms",
+    "timetable": "Timetable",
+    "staffAttendance": "Staff attendance",
+    "syllabi": "Syllabi",
+    "lessonPlans": "Lesson plans",
+    "assignments": "Assignments",
+    "exams": "Exam schedule",
+    "messages": "Messages",
+    "announcements": "Announcements",
+    "meetings": "Meetings",
+    "feeStructures": "Fee structures",
+    "invoices": "Invoices",
+    "expenses": "Expenses",
+    "reports": "Reports",
+    "groupAdmin": "Administrative",
+    "groupStaff": "Staff",
+    "groupAcademic": "Academic",
+    "groupCommunication": "Communication",
+    "groupFinance": "Finance",
+    "terms": "Terms",
+    "reportComments": "Report comments"
+  },
+  "roles": {
+    "SUPER_ADMIN": "Super admin",
+    "ADMIN": "Administrator",
+    "TEACHER": "Teacher",
+    "STUDENT": "Student",
+    "PARENT": "Parent"
+  },
+  "platform": {
+    "dashboard": "Platform dashboard",
+    "totalSchools": "Schools",
+    "pendingSchools": "Pending",
+    "activeSchools": "Active",
+    "schools": "Schools",
+    "plans": "Plans",
+    "createSchool": "Create a school",
+    "createPlan": "Create a plan",
+    "approve": "Approve",
+    "suspend": "Suspend",
+    "reactivate": "Reactivate",
+    "recordPayment": "Record a payment",
+    "paymentHistory": "Payment history",
+    "subscription": "Subscription",
+    "noSubscription": "No subscription",
+    "name": "Name",
+    "status": "Status",
+    "onboardingSource": "Source",
+    "plan": "Plan",
+    "amount": "Amount",
+    "method": "Method",
+    "reference": "Reference",
+    "notes": "Notes",
+    "viewDetails": "View details",
+    "schoolStatus": {
+      "PENDING_APPROVAL": "Pending approval",
+      "ACTIVE": "Active",
+      "SUSPENDED": "Suspended"
+    },
+    "onboarding": {
+      "MANUAL": "Manual",
+      "SELF_SERVICE": "Self-service"
+    },
+    "subscriptionStatus": {
+      "TRIALING": "Trialing",
+      "ACTIVE": "Active",
+      "PAST_DUE": "Past due",
+      "SUSPENDED": "Suspended",
+      "CANCELLED": "Cancelled"
+    },
+    "paymentMethod": {
+      "CASH": "Cash",
+      "MOBILE_MONEY": "Mobile money"
+    }
+  },
+  "signup": {
+    "title": "Sign up your school",
+    "subtitle": "Create your institution's account on the platform",
+    "schoolName": "School name",
+    "address": "Address",
+    "phone": "Phone",
+    "adminSectionTitle": "Administrator account",
+    "plan": "Desired plan",
+    "submit": "Sign up",
+    "success": "Your registration has been received — an administrator will validate your account shortly.",
+    "backToLogin": "Back to login"
+  },
+  "dashboard": {
+    "welcomeBack": "Welcome back, {{name}}!",
+    "totalStudents": "Students",
+    "totalTeachers": "Teachers",
+    "totalClasses": "Classes",
+    "mySchool": "My school",
+    "myChildren": "My children",
+    "myAttendance": "My attendance",
+    "myGrades": "My grades",
+    "overallAverage": "Overall average"
+  },
+  "students": {
+    "title": "Students",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "studentNumber": "Student number",
+    "class": "Class",
+    "email": "Email",
+    "addStudent": "Add student",
+    "noStudents": "No students found",
+    "photo": "Photo",
+    "idCard": "Student ID card",
+    "graduate": "Graduate",
+    "confirmGraduate": "Confirm graduating this student?"
+  },
+  "teachers": {
+    "photo": "Photo",
+    "details": "Details"
+  },
+  "rooms": {
+    "title": "Rooms",
+    "create": "Add room",
+    "name": "Name",
+    "capacity": "Capacity",
+    "type": "Type",
+    "noRooms": "No rooms"
+  },
+  "timetable": {
+    "title": "Timetable",
+    "create": "Add slot",
+    "selectClass": "Select a class",
+    "selectYear": "Select a year",
+    "subject": "Subject",
+    "teacher": "Teacher",
+    "room": "Room",
+    "dayOfWeek": "Day",
+    "day1": "Monday",
+    "day2": "Tuesday",
+    "day3": "Wednesday",
+    "day4": "Thursday",
+    "day5": "Friday",
+    "day6": "Saturday",
+    "day7": "Sunday",
+    "noSlots": "No slots",
+    "conflictError": "This slot conflicts with an existing slot (teacher or room already booked)."
+  },
+  "staffAttendance": {
+    "title": "Staff attendance",
+    "allTeachers": "All teachers",
+    "from": "From",
+    "to": "To",
+    "date": "Date",
+    "note": "Note",
+    "markTitle": "Mark attendance",
+    "selectTeacher": "Select a teacher",
+    "notePlaceholder": "Note (optional)"
+  },
+  "contracts": {
+    "title": "Contracts",
+    "create": "Add contract",
+    "fullTime": "Full time",
+    "partTime": "Part time",
+    "fixedTerm": "Fixed term",
+    "salary": "Salary"
+  },
+  "evaluations": {
+    "title": "Evaluations",
+    "create": "Add evaluation",
+    "score": "Score",
+    "comments": "Comments"
+  },
+  "syllabi": {
+    "title": "Syllabi",
+    "description": "Description"
+  },
+  "lessonPlans": {
+    "title": "Lesson plans",
+    "objectives": "Objectives",
+    "content": "Content"
+  },
+  "assignments": {
+    "title": "Assignments",
+    "titleField": "Title",
+    "description": "Description",
+    "dueDate": "Due date",
+    "viewSubmissions": "View submissions",
+    "submissions": "Submissions",
+    "submittedAt": "Submitted",
+    "feedback": "Feedback",
+    "maxScore": "Maximum score",
+    "late": "Late",
+    "countsInReport": "Count in report card",
+    "inReport": "Report card"
+  },
+  "messages": {
+    "title": "Messages",
+    "compose": "Compose",
+    "recipientId": "Recipient ID",
+    "content": "Message",
+    "send": "Send",
+    "inbox": "Inbox",
+    "sent": "Sent",
+    "noMessages": "No messages",
+    "read": "Read",
+    "unread": "Unread",
+    "selectRecipient": "Select a recipient"
+  },
+  "announcements": {
+    "title": "Announcements",
+    "create": "New announcement",
+    "titleField": "Title",
+    "content": "Content",
+    "allClasses": "All classes",
+    "noAnnouncements": "No announcements",
+    "audience": {
+      "ALL": "Everyone",
+      "ADMIN": "Admins",
+      "TEACHER": "Teachers",
+      "STUDENT": "Students",
+      "PARENT": "Parents"
+    }
+  },
+  "meetings": {
+    "title": "Meetings",
+    "noMeetings": "No meetings",
+    "with": "With {{name}}",
+    "about": "Regarding {{name}}",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "complete": "Mark completed",
+    "status": {
+      "REQUESTED": "Requested",
+      "CONFIRMED": "Confirmed",
+      "CANCELLED": "Cancelled",
+      "COMPLETED": "Completed"
+    },
+    "selectTeacher": "Select a teacher"
+  },
+  "feeStructures": {
+    "title": "Fee structures",
+    "name": "Name",
+    "amount": "Amount",
+    "allClasses": "All classes"
+  },
+  "invoices": {
+    "title": "Invoices",
+    "billClass": "Bill class",
+    "feeStructure": "Fee structure",
+    "allStatuses": "All statuses",
+    "statusLabel": "Status",
+    "paidAmount": "Paid amount",
+    "balance": "Balance",
+    "dueDate": "Due date",
+    "recordPayment": "Record payment",
+    "status": {
+      "PENDING": "Pending",
+      "PARTIALLY_PAID": "Partially paid",
+      "PAID": "Paid",
+      "OVERDUE": "Overdue",
+      "CANCELLED": "Cancelled"
+    }
+  },
+  "expenses": {
+    "title": "Expenses",
+    "category": "Category",
+    "amount": "Amount",
+    "description": "Description"
+  },
+  "reports": {
+    "title": "Reports",
+    "attendanceRate": "Attendance rate",
+    "outstandingInvoices": "Outstanding invoices",
+    "expensesThisMonth": "Expenses this month",
+    "attendanceCsv": "Attendance export (CSV)",
+    "financeCsv": "Finance export (CSV)",
+    "staffAttendanceCsv": "Staff attendance export (CSV)",
+    "download": "Download",
+    "reportCardTitle": "Report cards",
+    "reportCardHint": "Report cards are downloaded per student from the student's record."
+  },
+  "attendance": {
+    "title": "Attendance",
+    "date": "Date",
+    "status": "Status",
+    "PRESENT": "Present",
+    "ABSENT": "Absent",
+    "LATE": "Late",
+    "EXCUSED": "Excused",
+    "markAttendance": "Mark attendance",
+    "selectClass": "Select a class"
+  },
+  "grades": {
+    "title": "Grades",
+    "assessment": "Assessment",
+    "subject": "Subject",
+    "score": "Score",
+    "average": "Average",
+    "reportCard": "Report card",
+    "coefficient": "Coef.",
+    "downloadPdf": "Download PDF",
+    "rank": "Rank",
+    "classAverage": "Class average",
+    "generalComment": "General comment",
+    "mention": {
+      "CONGRATULATIONS": "Congratulations",
+      "ENCOURAGEMENTS": "Encouragements",
+      "HONOR_ROLL": "Honor roll",
+      "WARNING": "Work warning"
+    }
+  },
+  "exams": {
+    "title": "Exam schedule",
+    "createSession": "New session",
+    "deleteSession": "Delete session",
+    "sessionName": "Session name",
+    "createSlot": "Add exam slot",
+    "noSessions": "No exam sessions",
+    "noSlots": "No exams scheduled",
+    "allClasses": "All classes",
+    "date": "Date",
+    "time": "Time",
+    "room": "Room",
+    "supervisor": "Supervisor"
+  },
+  "language": {
+    "fr": "Français",
+    "en": "English"
+  },
+  "terms": {
+    "title": "Terms",
+    "create": "Add term",
+    "name": "Name",
+    "startDate": "Start",
+    "endDate": "End",
+    "noTerms": "No terms defined for this year",
+    "noTerm": "No term",
+    "term": "Term",
+    "wholeYear": "Whole year"
+  },
+  "subjects": {
+    "coefficient": "Coefficient",
+    "classCoefficients": "Class coefficients",
+    "classCoefficientsHint": "A class-specific coefficient replaces the subject coefficient when computing this class report cards.",
+    "defaultCoefficient": "Default",
+    "overridden": "Custom",
+    "resetDefault": "Reset"
+  },
+  "reportComments": {
+    "title": "Report card comments",
+    "general": "General comment",
+    "comment": "Comment"
+  }
+}
