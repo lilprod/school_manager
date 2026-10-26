@@ -19,6 +19,9 @@ import { PlatformSchoolsModule } from './platform-schools/platform-schools.modul
 import { SubscriptionsModule } from './subscriptions/subscriptions.module.js';
 import { RoomsModule } from './rooms/rooms.module.js';
 import { TimetableModule } from './timetable/timetable.module.js';
+import { SyllabiModule } from './syllabi/syllabi.module.js';
+import { LessonPlansModule } from './lesson-plans/lesson-plans.module.js';
+import { AssignmentsModule } from './assignments/assignments.module.js';
 
 @Module({
   imports: [
@@ -39,6 +42,9 @@ import { TimetableModule } from './timetable/timetable.module.js';
     SubscriptionsModule,
     RoomsModule,
     TimetableModule,
+    SyllabiModule,
+    LessonPlansModule,
+    AssignmentsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },
