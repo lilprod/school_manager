@@ -43,6 +43,11 @@ export async function createExamSlot(sessionId: string, payload: CreateExamSlotP
   return data
 }
 
+export async function updateExamSlot(id: string, payload: CreateExamSlotPayload): Promise<ExamSlot> {
+  const { data } = await api.patch<ExamSlot>(`/exam-slots/${id}`, payload)
+  return data
+}
+
 export async function deleteExamSlot(id: string): Promise<void> {
   await api.delete(`/exam-slots/${id}`)
 }

@@ -9,6 +9,7 @@ import {
   createExamSlot,
   deleteExamSession,
   deleteExamSlot,
+  updateExamSlot,
   fetchExamSessions,
   fetchExamSlots,
   fetchStudentExams,
@@ -41,7 +42,15 @@ function errorMessage(error: unknown, fallback: string): string | null {
   return fallback
 }
 
-function SlotsTable({ slots, onDelete }: { slots: ExamSlot[]; onDelete?: (id: string) => void }) {
+function SlotsTable({
+  slots,
+  onDelete,
+  onEdit,
+}: {
+  slots: ExamSlot[]
+  onDelete?: (id: string) => void
+  onEdit?: (slot: ExamSlot) => void
+}) {
   const { t } = useTranslation()
   if (slots.length === 0) {
     return <p className="text-sm text-slate-500 dark:text-slate-400">{t('exams.noSlots')}</p>
@@ -73,7 +82,16 @@ function SlotsTable({ slots, onDelete }: { slots: ExamSlot[]; onDelete?: (id: st
               {slot.supervisor ? `${slot.supervisor.user.firstName} ${slot.supervisor.user.lastName}` : '—'}
             </td>
             {onDelete && (
-              <td className="py-2">
+              <td className="space-x-3 py-2">
+                {onEdit && (
+                  <button
+                    type="button"
+                    onClick={() => onEdit(slot)}
+                    className="text-sm font-medium text-indigo-600 hover:underline dark:text-indigo-400"
+                  >
+                    {t('common.edit')}
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={() => onDelete(slot.id)}
@@ -121,6 +139,7 @@ function StaffView({ isAdmin }: { isAdmin: boolean }) {
   const queryClient = useQueryClient()
   const [showSessionForm, setShowSessionForm] = useState(false)
   const [showSlotForm, setShowSlotForm] = useState(false)
+  const [editingSlotId, setEditingSlotId] = useState<string | null>(null)
   const [sessionId, setSessionId] = useState('')
   const [classFilter, setClassFilter] = useState('')
 
@@ -178,6 +197,36 @@ function StaffView({ isAdmin }: { isAdmin: boolean }) {
       slotForm.reset()
     },
   })
+
+  const closeSlotForm = () => {
+    slotForm.reset({ classGroupId: '', subjectId: '', date: '', startTime: '', endTime: '', roomId: '', supervisorId: '' })
+    setEditingSlotId(null)
+    setShowSlotForm(false)
+  }
+
+  const updateSlot = useMutation({
+    mutationFn: (values: CreateExamSlotPayload) => updateExamSlot(editingSlotId!, values),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['exam-slots'] })
+      closeSlotForm()
+    },
+  })
+
+  const startEditing = (slot: ExamSlot) => {
+    slotForm.reset({
+      classGroupId: slot.classGroupId,
+      subjectId: slot.subjectId,
+      date: slot.date.slice(0, 10),
+      startTime: slot.startTime,
+      endTime: slot.endTime,
+      roomId: slot.roomId ?? '',
+      supervisorId: slot.supervisorId ?? '',
+    })
+    createSlot.reset()
+    updateSlot.reset()
+    setEditingSlotId(slot.id)
+    setShowSlotForm(true)
+  }
 
   const removeSlot = useMutation({
     mutationFn: deleteExamSlot,
@@ -272,7 +321,7 @@ function StaffView({ isAdmin }: { isAdmin: boolean }) {
             {isAdmin && (
               <button
                 type="button"
-                onClick={() => setShowSlotForm((v) => !v)}
+                onClick={() => (showSlotForm ? closeSlotForm() : setShowSlotForm(true))}
                 className="rounded-lg bg-indigo-600 px-3 py-1 text-sm font-medium text-white hover:bg-indigo-500"
               >
                 {t('exams.createSlot')}
@@ -284,11 +333,14 @@ function StaffView({ isAdmin }: { isAdmin: boolean }) {
             <div className="mb-4">
               <form
                 onSubmit={slotForm.handleSubmit((values) =>
-                  createSlot.mutate({
-                    ...values,
-                    roomId: values.roomId || undefined,
-                    supervisorId: values.supervisorId || undefined,
-                  }),
+                  editingSlotId
+                    ? // Chaîne vide : le backend retire la salle / le surveillant.
+                      updateSlot.mutate({ ...values, roomId: values.roomId ?? '', supervisorId: values.supervisorId ?? '' })
+                    : createSlot.mutate({
+                        ...values,
+                        roomId: values.roomId || undefined,
+                        supervisorId: values.supervisorId || undefined,
+                      }),
                 )}
                 className="grid grid-cols-1 gap-3 sm:grid-cols-4"
               >
@@ -335,14 +387,25 @@ function StaffView({ isAdmin }: { isAdmin: boolean }) {
                 >
                   {t('common.save')}
                 </button>
+                {editingSlotId && (
+                  <button type="button" onClick={closeSlotForm} className="text-sm text-slate-500 hover:underline">
+                    {t('common.cancel')}
+                  </button>
+                )}
               </form>
-              {errorMessage(createSlot.error, t('common.error') as string) && (
-                <p className="mt-3 text-sm text-red-600">{errorMessage(createSlot.error, t('common.error') as string)}</p>
+              {errorMessage(editingSlotId ? updateSlot.error : createSlot.error, t('common.error') as string) && (
+                <p className="mt-3 text-sm text-red-600">
+                  {errorMessage(editingSlotId ? updateSlot.error : createSlot.error, t('common.error') as string)}
+                </p>
               )}
             </div>
           )}
 
-          <SlotsTable slots={slots.data ?? []} onDelete={isAdmin ? (id) => removeSlot.mutate(id) : undefined} />
+          <SlotsTable
+            slots={slots.data ?? []}
+            onDelete={isAdmin ? (id) => removeSlot.mutate(id) : undefined}
+            onEdit={isAdmin ? startEditing : undefined}
+          />
         </Card>
       )}
     </div>
