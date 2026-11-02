@@ -4,5 +4,5 @@ export interface AuthenticatedUser {
   id: string;
   email: string;
   role: Role;
-  schoolId: string;
+  schoolId: string | null;
 }

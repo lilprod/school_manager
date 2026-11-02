@@ -38,7 +38,7 @@ export class UsersService {
     return users.map((user) => this.sanitize(user));
   }
 
-  async findOne(schoolId: string, id: string) {
+  async findOne(schoolId: string | null, id: string) {
     const user = await this.prisma.user.findFirst({ where: { id, schoolId } });
     if (!user) {
       throw new NotFoundException('Utilisateur introuvable.');

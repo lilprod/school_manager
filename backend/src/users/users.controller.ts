@@ -3,6 +3,7 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Role } from '@prisma/client';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
+import { requireSchoolId } from '../common/utils/require-school-id.js';
 import type { AuthenticatedUser } from '../auth/types/authenticated-user.js';
 import { ChangePasswordDto } from './dto/change-password.dto.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
@@ -28,30 +29,30 @@ export class UsersController {
   @Roles(Role.ADMIN)
   @Post()
   create(@CurrentUser() user: AuthenticatedUser, @Body() dto: CreateUserDto) {
-    return this.usersService.create(user.schoolId, dto);
+    return this.usersService.create(requireSchoolId(user), dto);
   }
 
   @Roles(Role.ADMIN)
   @Get()
   findAll(@CurrentUser() user: AuthenticatedUser) {
-    return this.usersService.findAll(user.schoolId);
+    return this.usersService.findAll(requireSchoolId(user));
   }
 
   @Roles(Role.ADMIN)
   @Get(':id')
   findOne(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
-    return this.usersService.findOne(user.schoolId, id);
+    return this.usersService.findOne(requireSchoolId(user), id);
   }
 
   @Roles(Role.ADMIN)
   @Patch(':id')
   update(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string, @Body() dto: UpdateUserDto) {
-    return this.usersService.update(user.schoolId, id, dto);
+    return this.usersService.update(requireSchoolId(user), id, dto);
   }
 
   @Roles(Role.ADMIN)
   @Delete(':id')
   remove(@CurrentUser() user: AuthenticatedUser, @Param('id') id: string) {
-    return this.usersService.remove(user.schoolId, id);
+    return this.usersService.remove(requireSchoolId(user), id);
   }
 }

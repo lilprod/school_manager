@@ -6,7 +6,7 @@ import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../prisma/prisma.service.js';
 import type { AuthenticatedUser } from './types/authenticated-user.js';
 
-interface TokenPair {
+export interface TokenPair {
   accessToken: string;
   refreshToken: string;
 }
@@ -74,9 +74,10 @@ export class AuthService {
 
   private signAccessToken(user: AuthenticatedUser): string {
     const payload = { sub: user.id, email: user.email, role: user.role, schoolId: user.schoolId };
+    const expiresIn = this.configService.get<string>('JWT_ACCESS_EXPIRES_IN') ?? '15m';
     return this.jwtService.sign(payload, {
       secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
-      expiresIn: this.configService.get<string>('JWT_ACCESS_EXPIRES_IN'),
+      expiresIn: expiresIn as unknown as number,
     });
   }
 
