@@ -202,8 +202,14 @@ complètent la gestion quotidienne d'une école. Prochaines étapes
 suggérées :
 
 - **Phase 2** : bibliothèque
+- **Application mobile — décision : PWA** (et non React Native) : un seul
+  code, installable sur l'écran d'accueil. Reste à faire : interface
+  réellement utilisable sur téléphone (menu latéral actuellement fixe,
+  jamais testé sur petit écran), manifeste et icônes, service worker,
+  consultation hors ligne légère (ex. bulletin). Limite connue : notifications
+  push moins fiables sur iPhone
 - **Phase 3** : transport, analytics avancés (tableaux de bord BI),
-  application mobile (React Native), intégration paiement en ligne (Stripe)
+  intégration paiement en ligne (Stripe)
 
 Hors scope, noté pour plus tard (voir `docs/delegation/00-OVERVIEW.md` et
 `docs/delegation/09-OVERVIEW-OPS.md`) :
