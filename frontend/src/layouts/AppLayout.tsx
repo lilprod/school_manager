@@ -35,6 +35,7 @@ const NAV_ITEMS: NavItem[] = [
     group: 'nav.groupStaff',
   },
 
+  { to: '/grading-settings', labelKey: 'nav.gradingSettings', roles: ['ADMIN'], group: 'nav.groupAcademic' },
   {
     to: '/report-comments',
     labelKey: 'nav.reportComments',

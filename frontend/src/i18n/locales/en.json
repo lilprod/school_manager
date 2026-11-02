@@ -57,7 +57,8 @@
     "groupCommunication": "Communication",
     "groupFinance": "Finance",
     "terms": "Terms",
-    "reportComments": "Report comments"
+    "reportComments": "Report comments",
+    "gradingSettings": "Report card mentions"
   },
   "roles": {
     "SUPER_ADMIN": "Super admin",
@@ -385,5 +386,25 @@
     "title": "Report card comments",
     "general": "General comment",
     "comment": "Comment"
+  },
+  "gradingSettings": {
+    "title": "Report card mentions",
+    "hint": "Overall-average thresholds (out of 20) that trigger each mention on your school report cards.",
+    "defaults": "Default values (customize them for your school).",
+    "custom": "Custom thresholds for your school.",
+    "congratulations": "Congratulations",
+    "encouragements": "Encouragements",
+    "honorRoll": "Honor roll",
+    "warning": "Work warning",
+    "atLeast": "minimum average",
+    "below": "below",
+    "reset": "Restore defaults",
+    "preview": "Rules preview",
+    "rangeFrom": "{{value}} and above",
+    "rangeBetween": "from {{min}} up to {{max}}",
+    "rangeBelow": "below {{value}}",
+    "noMention": "no mention",
+    "errorRange": "Thresholds must be between 0 and 20.",
+    "errorOrder": "Thresholds must satisfy: warning ≤ honor roll < encouragements < congratulations."
   }
 }

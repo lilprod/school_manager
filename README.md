@@ -138,7 +138,8 @@ pour illustrer le support des parents multi-écoles.
 - **Bulletin enrichi** : notes de devoirs corrigés intégrées au bulletin
   (option par devoir, avec coefficient et trimestre), rang dans la classe
   (ex æquo gérés) et moyenne de classe, mention automatique
-  (félicitations, encouragements, tableau d'honneur, avertissement),
+  (félicitations, encouragements, tableau d'honneur, avertissement) dont
+  les seuils sont réglables par école (16 / 14 / 12 / moins de 8 par défaut),
   appréciations générale (administrateur) et par matière (enseignant de
   la matière) affichées à l'écran et dans le PDF
 - **Calendrier d'examens** : sessions d'examen (rattachables à un

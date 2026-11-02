@@ -38,6 +38,7 @@ import { ContactsModule } from './contacts/contacts.module.js';
 import { ClassCoefficientsModule } from './class-coefficients/class-coefficients.module.js';
 import { ReportCommentsModule } from './report-comments/report-comments.module.js';
 import { ExamsModule } from './exams/exams.module.js';
+import { GradingSettingsModule } from './grading-settings/grading-settings.module.js';
 
 @Module({
   imports: [
@@ -76,6 +77,7 @@ import { ExamsModule } from './exams/exams.module.js';
     ClassCoefficientsModule,
     ReportCommentsModule,
     ExamsModule,
+    GradingSettingsModule,
   ],
   providers: [
     { provide: APP_GUARD, useClass: JwtAuthGuard },

@@ -8,6 +8,7 @@ import DashboardPage from './pages/DashboardPage'
 import ExpensesPage from './pages/ExpensesPage'
 import FeeStructuresPage from './pages/FeeStructuresPage'
 import GradesPage from './pages/GradesPage'
+import GradingSettingsPage from './pages/GradingSettingsPage'
 import InvoicesPage from './pages/InvoicesPage'
 import LessonPlansPage from './pages/LessonPlansPage'
 import LoginPage from './pages/LoginPage'
@@ -130,6 +131,14 @@ export default function App() {
           element={
             <ProtectedRoute roles={['ADMIN']}>
               <TermsPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/grading-settings"
+          element={
+            <ProtectedRoute roles={['ADMIN']}>
+              <GradingSettingsPage />
             </ProtectedRoute>
           }
         />

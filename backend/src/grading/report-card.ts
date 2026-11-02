@@ -84,12 +84,45 @@ export const MENTION_LABELS_FR: Record<Mention, string> = {
   WARNING: 'Avertissement travail',
 };
 
-/** Mention automatique selon la moyenne générale (sur 20). */
-export function mentionFor(average: number): Mention | null {
-  if (average >= 16) return 'CONGRATULATIONS';
-  if (average >= 14) return 'ENCOURAGEMENTS';
-  if (average >= 12) return 'HONOR_ROLL';
-  if (average < 8) return 'WARNING';
+export interface MentionThresholds {
+  congratulationsMin: number;
+  encouragementsMin: number;
+  honorRollMin: number;
+  warningBelow: number;
+}
+
+export const DEFAULT_MENTION_THRESHOLDS: MentionThresholds = {
+  congratulationsMin: 16,
+  encouragementsMin: 14,
+  honorRollMin: 12,
+  warningBelow: 8,
+};
+
+/**
+ * Seuils cohérents : avertissement ≤ tableau d'honneur < encouragements <
+ * félicitations, tous compris entre 0 et 20 (sinon une moyenne pourrait
+ * cumuler plusieurs mentions ou un avertissement et une distinction).
+ */
+export function validateMentionThresholds(t: MentionThresholds): string | null {
+  const values = [t.warningBelow, t.honorRollMin, t.encouragementsMin, t.congratulationsMin];
+  if (values.some((v) => !Number.isFinite(v) || v < 0 || v > 20)) {
+    return 'Les seuils doivent être compris entre 0 et 20.';
+  }
+  if (!(t.warningBelow <= t.honorRollMin && t.honorRollMin < t.encouragementsMin && t.encouragementsMin < t.congratulationsMin)) {
+    return "Les seuils doivent respecter : avertissement ≤ tableau d'honneur < encouragements < félicitations.";
+  }
+  return null;
+}
+
+/** Mention automatique selon la moyenne générale (sur 20) et les seuils de l'école. */
+export function mentionFor(
+  average: number,
+  thresholds: MentionThresholds = DEFAULT_MENTION_THRESHOLDS,
+): Mention | null {
+  if (average >= thresholds.congratulationsMin) return 'CONGRATULATIONS';
+  if (average >= thresholds.encouragementsMin) return 'ENCOURAGEMENTS';
+  if (average >= thresholds.honorRollMin) return 'HONOR_ROLL';
+  if (average < thresholds.warningBelow) return 'WARNING';
   return null;
 }
 

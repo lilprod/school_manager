@@ -7,6 +7,7 @@ import type { UpdateAssessmentDto } from './dto/update-assessment.dto.js';
 import {
   computeReportCard,
   computeStanding,
+  DEFAULT_MENTION_THRESHOLDS,
   mentionFor,
   type GradeInput,
 } from './report-card.js';
@@ -141,7 +142,12 @@ export class GradingService {
     const enrollment = await this.prisma.enrollment.findFirst({
       where: { studentId, academicYearId },
       orderBy: { createdAt: 'desc' },
+      include: { classGroup: { select: { schoolId: true } } },
     });
+    const settings = enrollment
+      ? await this.prisma.gradingSettings.findUnique({ where: { schoolId: enrollment.classGroup.schoolId } })
+      : null;
+    const thresholds = settings ?? DEFAULT_MENTION_THRESHOLDS;
 
     // Élèves classés avec lui : même classe, même année (hors transferts sortants).
     const classmateIds = enrollment
@@ -194,7 +200,7 @@ export class GradingService {
       rank: standing.rank,
       classSize: standing.classSize,
       classAverage: standing.classAverage,
-      mention: hasGrades ? mentionFor(own.overallAverage) : null,
+      mention: hasGrades ? mentionFor(own.overallAverage, thresholds) : null,
       generalComment: comments.find((c) => c.subjectId === null)?.comment ?? null,
       subjectComments: Object.fromEntries(
         comments.filter((c) => c.subjectId !== null).map((c) => [c.subjectId as string, c.comment]),

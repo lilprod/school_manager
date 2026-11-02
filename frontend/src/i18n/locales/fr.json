@@ -57,7 +57,8 @@
     "groupCommunication": "Communication",
     "groupFinance": "Finance",
     "terms": "Trimestres",
-    "reportComments": "Appréciations"
+    "reportComments": "Appréciations",
+    "gradingSettings": "Mentions du bulletin"
   },
   "roles": {
     "SUPER_ADMIN": "Super-administrateur",
@@ -385,5 +386,25 @@
     "title": "Appréciations du bulletin",
     "general": "Appréciation générale",
     "comment": "Appréciation"
+  },
+  "gradingSettings": {
+    "title": "Mentions du bulletin",
+    "hint": "Seuils de la moyenne générale (sur 20) qui déclenchent chaque mention sur les bulletins de votre école.",
+    "defaults": "Valeurs par défaut (personnalisez-les pour votre établissement).",
+    "custom": "Seuils personnalisés pour votre école.",
+    "congratulations": "Félicitations",
+    "encouragements": "Encouragements",
+    "honorRoll": "Tableau d'honneur",
+    "warning": "Avertissement travail",
+    "atLeast": "moyenne minimale",
+    "below": "en dessous de",
+    "reset": "Rétablir les valeurs par défaut",
+    "preview": "Aperçu des règles",
+    "rangeFrom": "{{value}} et plus",
+    "rangeBetween": "de {{min}} à moins de {{max}}",
+    "rangeBelow": "moins de {{value}}",
+    "noMention": "aucune mention",
+    "errorRange": "Les seuils doivent être compris entre 0 et 20.",
+    "errorOrder": "Les seuils doivent respecter : avertissement ≤ tableau d'honneur < encouragements < félicitations."
   }
 }

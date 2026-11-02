@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { computeReportCard, computeStanding, mentionFor, type GradeInput } from './report-card.js';
+import {
+  computeReportCard,
+  computeStanding,
+  mentionFor,
+  validateMentionThresholds,
+  type GradeInput,
+} from './report-card.js';
 
 const grade = (overrides: Partial<GradeInput>): GradeInput => ({
   score: 10,
@@ -95,5 +101,39 @@ describe('computeStanding', () => {
 
   it('ne classe pas un élève sans note', () => {
     expect(computeStanding('z', averages).rank).toBeNull();
+  });
+});
+
+describe('mentionFor avec seuils personnalisés', () => {
+  const custom = { congratulationsMin: 15, encouragementsMin: 13, honorRollMin: 10, warningBelow: 6 };
+
+  it.each([
+    [15, 'CONGRATULATIONS'],
+    [13.5, 'ENCOURAGEMENTS'],
+    [10, 'HONOR_ROLL'],
+    [8, null],
+    [5.9, 'WARNING'],
+  ])('moyenne %s -> %s', (average, expected) => {
+    expect(mentionFor(average, custom)).toBe(expected);
+  });
+});
+
+describe('validateMentionThresholds', () => {
+  const ok = { congratulationsMin: 16, encouragementsMin: 14, honorRollMin: 12, warningBelow: 8 };
+
+  it('accepte des seuils cohérents', () => {
+    expect(validateMentionThresholds(ok)).toBeNull();
+    expect(validateMentionThresholds({ ...ok, warningBelow: 12 })).toBeNull();
+  });
+
+  it.each([
+    [{ ...ok, encouragementsMin: 16 }],
+    [{ ...ok, honorRollMin: 15 }],
+    [{ ...ok, warningBelow: 13 }],
+    [{ ...ok, congratulationsMin: 21 }],
+    [{ ...ok, warningBelow: -1 }],
+    [{ ...ok, honorRollMin: Number.NaN }],
+  ])('refuse des seuils incohérents %#', (thresholds) => {
+    expect(validateMentionThresholds(thresholds)).not.toBeNull();
   });
 });

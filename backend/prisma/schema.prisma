@@ -88,6 +88,7 @@ enum MeetingStatus {
 }
 
 model School {
+  gradingSettings  GradingSettings?
   id               String           @id @default(cuid())
   name             String
   address          String?
@@ -764,4 +765,15 @@ model ReportComment {
   updatedAt      DateTime       @updatedAt
 
   @@index([studentId, academicYearId])
+}
+
+model GradingSettings {
+  id                 String   @id @default(cuid())
+  schoolId           String   @unique
+  school             School   @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+  congratulationsMin Float    @default(16)
+  encouragementsMin  Float    @default(14)
+  honorRollMin       Float    @default(12)
+  warningBelow       Float    @default(8)
+  updatedAt          DateTime @updatedAt
 }
