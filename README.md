@@ -1,11 +1,14 @@
 # Gestion d'École — School Management System
 
-Système de gestion scolaire (MVP / Phase 1) : authentification par rôle,
-gestion des élèves, enseignants, classes, matières, présences et notes.
+Système de gestion scolaire multi-écoles : authentification par rôle, gestion
+des élèves, enseignants, classes, matières, présences, notes et bulletins,
+emploi du temps, examens, communication, finance (frais de scolarité) et
+rapports, avec une couche SaaS (écoles, plans, abonnements manuels).
 
 Backend TypeScript/NestJS + PostgreSQL/Prisma, frontend React/TypeScript.
-Voir [Roadmap](#roadmap--prochaines-phases) pour le périmètre complet prévu
-(finances, bibliothèque, transport, mobile, etc.) et ce qui est déjà livré.
+Voir [État d'avancement](#état-davancement) pour ce qui est livré ou non
+(bibliothèque, transport et adaptation mobile ne sont pas encore
+développés) et la [Roadmap](#roadmap--prochaines-phases).
 
 ## Stack technique
 
@@ -146,8 +149,9 @@ pour illustrer le support des parents multi-écoles.
   trimestre) et créneaux par classe/matière/salle/surveillant avec
   détection des conflits (classe, salle, surveillant) ; consultation par
   l'élève et ses parents
-- **Interface** : tableaux de bord par rôle, FR/EN, mode sombre, design
-  responsive
+- **Interface** : tableaux de bord par rôle, FR/EN, mode sombre. Conçue
+  pour ordinateur : l'affichage sur téléphone n'a pas encore été adapté
+  ni testé (voir la PWA dans la roadmap)
 
 ### Plateforme SaaS (Phase 1.5)
 
@@ -194,6 +198,36 @@ pour illustrer le support des parents multi-écoles.
   bord administrateur (effectifs, taux de présence, factures impayées,
   dépenses du mois)
 
+## Tests
+
+```bash
+cd backend
+pnpm test        # tests unitaires (vitest) : bulletin, rang, mentions, conflits d'examens, intercepteur
+pnpm test:e2e    # squelette e2e uniquement (2 tests de base), pas de parcours métier
+pnpm build && pnpm lint
+
+cd ../frontend
+pnpm build       # vérification TypeScript + build
+```
+
+Le flux applicatif a été vérifié manuellement en navigateur réel
+(Playwright) et par appels API, mais il n'existe pas encore de tests
+d'intégration automatisés ni d'intégration continue (CI).
+
+## État d'avancement
+
+| Domaine | État |
+|---|---|
+| Administratif, élèves, enseignants/staff | Livré |
+| Académique (notes, coefficients, bulletin, examens, devoirs, programmes) | Livré |
+| Communication (messages, annonces, rendez-vous) | Livré, in-app uniquement (pas d'e-mail/SMS/push) |
+| Finance (frais de scolarité, dépenses) et rapports CSV/PDF | Livré |
+| Plateforme SaaS (écoles, plans, abonnements, paiements manuels) | Livré, quotas et expiration des essais non appliqués |
+| Application mobile (PWA) | Décidée, non commencée |
+| Bibliothèque | Non développée |
+| Transport | Non développé |
+| Docker Compose | Écrit, jamais exécuté |
+
 ## Roadmap — prochaines phases
 
 Le prompt d'origine couvrait un ERP scolaire complet (12 modules, apps
@@ -202,15 +236,18 @@ gouvernance SaaS multi-écoles ; les modules opérationnels ci-dessus
 complètent la gestion quotidienne d'une école. Prochaines étapes
 suggérées :
 
-- **Phase 2** : bibliothèque
+- **Phase 2** : bibliothèque (catalogue, prêts/retours, retards,
+  réservations, historique par élève)
 - **Application mobile — décision : PWA** (et non React Native) : un seul
   code, installable sur l'écran d'accueil. Reste à faire : interface
   réellement utilisable sur téléphone (menu latéral actuellement fixe,
   jamais testé sur petit écran), manifeste et icônes, service worker,
   consultation hors ligne légère (ex. bulletin). Limite connue : notifications
   push moins fiables sur iPhone
-- **Phase 3** : transport, analytics avancés (tableaux de bord BI),
-  intégration paiement en ligne (Stripe)
+- **Phase 3** : transport (véhicules, chauffeurs, lignes et arrêts,
+  affectation des élèves, frais rattachés à la facturation ; suivi GPS en
+  dernier), analytics avancés (tableaux de bord BI), intégration paiement
+  en ligne (Stripe)
 
 Hors scope, noté pour plus tard (voir `docs/delegation/00-OVERVIEW.md` et
 `docs/delegation/09-OVERVIEW-OPS.md`) :
